@@ -16,7 +16,7 @@
  * Motor()
  * @function : Dafault consturctor
  */
-Moter::Motor()
+Motor::Motor()
 {
 }
 
@@ -27,7 +27,7 @@ Moter::Motor()
   * @return : -1 Error , 1 OK
   * @detail : 공통부분. wiringPi 설정 및 속도 초기화
   */
-int Moter::init()
+int Motor::init()
 {
     speed = 0;
     
@@ -64,7 +64,7 @@ void Motor::calibration()
  * @ param    : Speed value, range ( 0 ~ 2500 )
  * @ detail   : 공통부분. Range 범위 내의 속도 지정
  */
-void Moter::setSpeed(int value)
+void Motor::setSpeed(int value)
 {
 
 }
@@ -76,7 +76,7 @@ void Moter::setSpeed(int value)
  * @function : Stop drone
  * @detail   : 공통부분. 속도 0 지정 
  */
-void Moter::stop()
+void Motor::stop()
 {
 
 } 
