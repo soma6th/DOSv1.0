@@ -2,26 +2,27 @@ class PID{
 
     private:
 
-        double Kd;
-        double Ki;
-        double Kp;
+        float Kd;
+        float Ki;
+        float Kp;
 
-        double P_pid;
-        double I_pid;
-        double D_pid;
-        double dt;
-        double P_pid_prev;
-        double output;
+        float P_pid;
+        float I_pid;
+        float D_pid;
 
-        int throttle;
+        float P_err;
+        float I_err;
+        float D_err;
+
+        float dt;
+        float P_pid_prev;
 
     public:
 
         PID();
-        PID(double kd, double ki, double kp);
-
+        
         int init();
-        void setTuning(double kd, double ki, double  kp);
-        double calcPID(double aimVal, double inVal);
+        void setTuning(float kd, float ki, float kp);
+        int calcPID(float aimVal, float inVal);
         
 };
