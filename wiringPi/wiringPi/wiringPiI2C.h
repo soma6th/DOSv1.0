@@ -26,6 +26,8 @@
 extern "C" {
 #endif
 
+#include <stdint.h>
+
 extern int wiringPiI2CRead           (int fd) ;
 extern int wiringPiI2CReadReg8       (int fd, int reg) ;
 extern int wiringPiI2CReadReg16      (int fd, int reg) ;
@@ -36,6 +38,23 @@ extern int wiringPiI2CWriteReg16     (int fd, int reg, int data) ;
 
 extern int wiringPiI2CSetupInterface (const char *device, int devId) ;
 extern int wiringPiI2CSetup          (const int devId) ;
+
+
+extern int wiringPiI2CReadBit 		 (int fd, uint8_t devAddr, uint8_t regAddr, uint8_t bitNum, uint8_t *data);
+extern int wiringPiI2CReadBitW 		 (int fd, uint8_t devAddr, uint8_t regAddr, uint8_t bitNum, uint16_t *data);
+extern int wiringPiI2CReadBits 		 (int fd, uint8_t devAddr, uint8_t regAddr, uint8_t bitStart, uint8_t length, uint8_t *data);
+extern int wiringPiI2CReadBitsW 	 (int fd, uint8_t devAddr, uint8_t regAddr, uint8_t bitStart, uint8_t length, uint16_t *data);
+extern int wiringPiI2CReadByte 		 (int fd, uint8_t devAddr, uint8_t regAddr, uint8_t *data);
+extern int wiringPiI2CReadWord 		 (int fd, uint8_t devAddr, uint8_t regAddr, uint16_t *data);
+extern int wiringPiI2CReadBytes 	 (int fd, uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8_t *data);
+
+extern int wiringPiI2CWriteBit 		 (int fd, uint8_t devAddr, uint8_t regAddr, uint8_t bitNum, uint8_t data);
+extern int wiringPiI2CWriteBitW 	 (int fd, uint8_t devAddr, uint8_t regAddr, uint8_t bitNum, uint16_t data);
+extern int wiringPiI2CWriteBits 	 (int fd, uint8_t devAddr, uint8_t regAddr, uint8_t bitStart, uint8_t length, uint8_t data);
+extern int wiringPiI2CWriteBitsW 	 (int fd, uint8_t devAddr, uint8_t regAddr, uint8_t bitStart, uint8_t length, uint16_t data);
+extern int wiringPiI2CWriteByte 	 (int fd, uint8_t devAddr, uint8_t regAddr, uint8_t data);
+extern int wiringPiI2CWriteWord 	 (int fd, uint8_t devAddr, uint8_t regAddr, uint16_t data);
+extern int wiringPiI2CWriteBytes 	 (int fd, uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8_t *data);
 
 #ifdef __cplusplus
 }
