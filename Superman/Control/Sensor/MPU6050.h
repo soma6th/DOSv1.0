@@ -21,7 +21,14 @@
 #include "SensorInterface.h"
 #include "MPU6050_Registers.h"
 
-#define MPU6050_DEBUG 1
+#define MPU6050_DEBUG 0
+
+#if MPU6050_DEBUG
+	#define DEBUG_PRINT(fmt, ...) printf(fmt,##__VA_ARGS__)
+#else
+	#define DEBUG_PRINT(fmt, ...)
+#endif
+
 
 class MPU6050 {
     public:
