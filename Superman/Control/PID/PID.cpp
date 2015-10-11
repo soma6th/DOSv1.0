@@ -44,7 +44,7 @@ int PID::calcPID(float aimVal, float inVal)
     P_pid_prev = P_pid;
 
 
-    printf("[p] = %f, [I] = %f, [D] = %f\n", P_pid, I_pid, D_pid);
+//    printf("[p] = %f, [I] = %f, [D] = %f\n", P_pid, I_pid, D_pid);
     output =P_pid + I_pid  +  D_pid; 
     
     return output;
