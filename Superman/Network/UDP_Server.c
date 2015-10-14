@@ -11,6 +11,7 @@
 #include <sys/socket.h> /* for socket(), bind(), and connect() */
 #include <arpa/inet.h>  /* for sockaddr_in and inet_ntoa() */
 #include <string.h>     /* for memset() */
+#include <unistd.h>
 #include <stdio.h>  /* for perror() */
 #include <stdlib.h> /* for exit() */
 
@@ -28,7 +29,10 @@ int CreateUDPServerSocket(unsigned short port)
 {
     int sock;                        /* socket to create */
     struct sockaddr_in ServAddr; /* Local address */
-    
+	struct sockaddr_in taddr;
+    char buf[150];
+	int size;
+	memset(buf,0,sizeof(buf));
     /* Create socket for incoming connections */
     if ((sock = socket(PF_INET, SOCK_DGRAM, 0)) < 0)
     {
@@ -45,8 +49,11 @@ int CreateUDPServerSocket(unsigned short port)
     {
         return 0;
     }
+
+	printf("Create socket: %s:%d\n",inet_ntoa(ServAddr.sin_addr),ntohs(ServAddr.sin_port));
     
     return sock;
+
 }
 
 
@@ -67,7 +74,12 @@ int Connected_UDP(int tcp,unsigned short port)
     int client_len;
     
     struct sockaddr_in udp_addr;
-    
+	struct sockaddr_in con_addr;    
+	char buf[100];
+	int str_len;
+	int length;
+	memset(buf,0,sizeof(buf));
+
     // Create socket for incoming connections
     if((udp=socket(PF_INET,SOCK_DGRAM,0))<0)
         return -1;
@@ -75,75 +87,42 @@ int Connected_UDP(int tcp,unsigned short port)
     //setting for 0
     memset(&udp_addr,0,sizeof(udp_addr));
     udp_addr.sin_family=AF_INET;
-    udp_addr.sin_addr.s_addr=htonl(INADDR_ANY);
+	inet_aton("10.10.0.1",&udp_addr.sin_addr);
+    //udp_addr.sin_addr.s_addr=htonl(INADDR_ANY);
     udp_addr.sin_port=htons(port);
     
     //Bind to the local address
     if (bind(udp,(struct sockaddr *) &udp_addr, sizeof(udp_addr)) < 0)
         return 0;
+	
+    printf("server ip is %s\n",inet_ntoa(udp_addr.sin_addr));
+    printf("server port is %d %d\n",udp_addr.sin_port,ntohs(udp_addr.sin_port));
     
-    memset(&udp_addr,0,sizeof(udp_addr));
-    getpeername(tcp,(struct sockaddr*)&udp_addr,&client_len);
-    
-    if(connect(udp,(struct sockaddr*)&udp_addr,sizeof(udp_addr))<0)
-    {
-        printf("udp connect error\n");
-        exit(1);
-    }
-    
-    printf("client ip is %s\n",inet_ntoa(udp_addr.sin_addr));
-    printf("client port is %d %d\n",udp_addr.sin_port,ntohs(udp_addr.sin_port));
-    
-    return udp;
+    memset(&con_addr,0,sizeof(con_addr));
+
+	length=sizeof(con_addr);
+
+	str_len=recvfrom(udp,buf,100-1,0,(struct sockaddr*)&con_addr,&length);
+
+	printf("in ff buf: %s\n",buf);
+
+	if(connect(udp,(struct sockaddr*)&con_addr,sizeof(con_addr))<0)
+	{
+		printf("udp connect error\n");
+		exit(1);
+	}
+
+	printf("client ip is %s\n",inet_ntoa(con_addr.sin_addr));
+	printf("client port is %d %d\n",con_addr.sin_port,ntohs(con_addr.sin_port));
+
+	//str_len=recv(udp,buf,100-1,0);
+	//printf("in uu buf: %s\n",buf);
+
+	//buf[str_len]=0;
+	//send(udp,buf,100-1,0);
+	//printf("out uu buf: %s\n",buf);
+
+	return udp;
 }
 
-/*
- * @function : 만약에 1:1로 계속 왔다갔다하는 UDP socket을 생성하게 된다면,
- * 그냥 socket을 생성하는것보다, connected udp를 열게 되면, UDP socket에
- * IP와 PORT번호 정보가 등록되어, 성능향상을 기대 할 수 있다. 또한 기존의 UDP함수가
- * recvfrom이나, sendto를 사용했던것에 반해 read,write함수를 사용 가능하므로,
- * 실제 코드의 효율성도 증가함으로, UDP는 생성하자마자 connected udp를 지향한다.
- *
- * @param: tcp(getpeername으로 상대방의 ip를 확인하기 위한 변수)
- * port(상대 udp port번호를 알기 위한 변수)
- * @return: 실제로 연결된 client와 1:1로 연결되어 있는 TCP소켓 디스크립터
- */
-int Connected_UDP1(int tcp,unsigned short port)
-{
-    int udp;
-    int client_len;
-    
-    struct sockaddr_in udp_addr;
-    
-    // Create socket for incoming connections
-    if((udp=socket(PF_INET,SOCK_DGRAM,0))<0)
-        return -1;
-    
-    //setting for 0
-    memset(&udp_addr,0,sizeof(udp_addr));
-    udp_addr.sin_family=AF_INET;
-    udp_addr.sin_addr.s_addr=htonl(INADDR_ANY);
-    udp_addr.sin_port=htons(port);
-    
-    //Bind to the local address
-    if (bind(udp,(struct sockaddr *) &udp_addr, sizeof(udp_addr)) < 0)
-        return 0;
-    
-    memset(&udp_addr,0,sizeof(udp_addr));
-    //getpeername(tcp,(struct sockaddr*)&udp_addr,&client_len);
-    
-    udp_addr.sin_family=AF_INET;
-    udp_addr.sin_addr.s_addr=htonl(INADDR_ANY);
-    udp_addr.sin_port=htons(port);
-    
-    if(connect(udp,(struct sockaddr*)&udp_addr,sizeof(udp_addr))<0)
-    {
-        printf("udp connect error\n");
-        exit(1);
-    }
-    
-    printf("client ip is %s\n",inet_ntoa(udp_addr.sin_addr));
-    printf("client port is %d %d\n",udp_addr.sin_port,ntohs(udp_addr.sin_port));
-    
-    return udp;
-}
+

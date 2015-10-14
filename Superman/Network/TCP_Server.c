@@ -13,7 +13,7 @@
 #include <string.h>     /* for memset() */
 #include <stdio.h>  /* for perror() */
 #include <stdlib.h> /* for exit() */
-#include "Ctl.h"
+#include "ctl.h"
 
 #define MAXPENDING 100    /* Maximum outstanding connection requests */
 #define RCVBUFSIZE 32   /* Size of receive buffer */
@@ -108,4 +108,3 @@ int TCP_connect(unsigned short port)
 
 	return clnt_sock;
 }
-
