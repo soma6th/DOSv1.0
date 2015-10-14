@@ -56,7 +56,6 @@ int CreateUDPServerSocket(unsigned short port)
 
 }
 
-
 /*
  * @function : 만약에 1:1로 계속 왔다갔다하는 UDP socket을 생성하게 된다면,
  * 그냥 socket을 생성하는것보다, connected udp를 열게 되면, UDP socket에
@@ -69,7 +68,7 @@ int CreateUDPServerSocket(unsigned short port)
  * @return: 실제로 연결된 client와 1:1로 연결되어 있는 TCP소켓 디스크립터
  */
 int Connected_UDP(unsigned short port)
-
+{
     int udp;
     
     struct sockaddr_in udp_addr;
@@ -79,29 +78,28 @@ int Connected_UDP(unsigned short port)
 	int str_len;
 	int length;
 
+
 	memset(buf,0,sizeof(buf));
+	if((udp=socket(PF_INET,SOCK_DGRAM,0))<0)
+		return -1;
 
-    // Create socket for incoming connections
-    if((udp=socket(PF_INET,SOCK_DGRAM,0))<0)
-        return -1;
-
-    //setting for 0
-    memset(&udp_addr,0,sizeof(udp_addr));
-    udp_addr.sin_family=AF_INET;
+	//setting for 0
+	memset(&udp_addr,0,sizeof(udp_addr));
+	udp_addr.sin_family=AF_INET;
 	//inet_aton("10.10.0.1",&udp_addr.sin_addr);
-    udp_addr.sin_addr.s_addr=htonl(INADDR_ANY);
-    udp_addr.sin_port=htons(port);
-    
-    //Bind to the local address
-    if (bind(udp,(struct sockaddr *) &udp_addr, sizeof(udp_addr)) < 0)
-        return 0;
-	
-    printf("server ip is %s\n",inet_ntoa(udp_addr.sin_addr));
-    printf("server port is %d %d\n",udp_addr.sin_port,ntohs(udp_addr.sin_port));
-    
-    memset(&con_addr,0,sizeof(con_addr));
+	udp_addr.sin_addr.s_addr=htonl(INADDR_ANY);
+	udp_addr.sin_port=htons(port);
 
-    //important if can't call, can't read client address
+	//Bind to the local address
+	if (bind(udp,(struct sockaddr *) &udp_addr, sizeof(udp_addr)) < 0)
+		return 0;
+
+	printf("server ip is %s\n",inet_ntoa(udp_addr.sin_addr));
+	printf("server port is %d %d\n",udp_addr.sin_port,ntohs(udp_addr.sin_port));
+
+	memset(&con_addr,0,sizeof(con_addr));
+
+	//important if can't call, can't read client address
 	length=sizeof(con_addr);
 
 	str_len=recvfrom(udp,buf,100-1,0,(struct sockaddr*)&con_addr,&length);
@@ -117,7 +115,5 @@ int Connected_UDP(unsigned short port)
 	printf("client ip is %s\n",inet_ntoa(con_addr.sin_addr));
 	printf("client port is %d %d\n",con_addr.sin_port,ntohs(con_addr.sin_port));
 
-    return udp;
+	return udp;
 }
-
-

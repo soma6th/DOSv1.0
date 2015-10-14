@@ -12,7 +12,9 @@
 #include <stdio.h>      /* for printf() and fprintf() */
 #include <unistd.h>
 #include <jansson.h>
-#define MAXBUFF 150;
+#include "network.h"
+
+#define MAXBUFF 150
 
 /*
  * @function :
@@ -26,6 +28,7 @@ int network_init()
     int udp;
     //create tcp socket
     tcp=TCP_connect(__TCP_PORT__);
+
     memset(buf,0,sizeof(buf));
     recv(tcp,buf,MAXBUFF-1,0);
     printf("r buf: %s\n",buf);
@@ -35,7 +38,7 @@ int network_init()
     printf("r buf: %s\n",buf);
     
     udp=Connected_UDP(__UDP_PORT__);
-    if(udp_sock<2)
+    if(udp<2)
     {
         printf("socket create error\n");
         exit(1);
@@ -53,7 +56,7 @@ int network_init()
 int network_read(int socket,float* x,float* y,float* z,int* t)
 {
     char buf[MAXBUFF];
-    int header;
+    int header,str_len;
     json_t *data;
     json_error_t error;
     
@@ -61,11 +64,11 @@ int network_read(int socket,float* x,float* y,float* z,int* t)
     str_len=recv(socket,buf,MAXBUFF-1,MSG_DONTROUTE|MSG_DONTWAIT);
     buf[str_len]=0;
     
-    test=json_loads(buf,JSON_DECODE_ANY,&error);
+    data=json_loads(buf,JSON_DECODE_ANY,&error);
     
-    if((json_unpack(root,"{s:i,s:f,s:f,s:f,s:i}","P_H",&header,"P_X",x,"P_Y",y,"P_Z",z,"P_T",t))!=0)
+    if((json_unpack(data,"{s:i,s:f,s:f,s:f,s:i}","P_H",&header,"P_X",x,"P_Y",y,"P_Z",z,"P_T",t))!=0)
     {
-        printF("json_unpack fail\n");
+        printf("json_unpack fail\n");
         return 0;
     }
     
@@ -79,13 +82,13 @@ int network_read(int socket,float* x,float* y,float* z,int* t)
  */
 void network_write(int socket,float x,float y,float z,int t)
 {
-    char buf[MAXBUFF];
+    char *buf;
     int header=2;
     json_t *data;
     
-    data = json_pack("{s:i,s:f,s:f,s:f,s:i}","P_H",header,"P_X",x,"P_Y",y,"P_Z",z,"P_T",t);
-    buf = json_dumps(data, JSON_ENCODE_ANY);
-    send(socket,buf,MAXBUFF-1,MSG_DONTROUTE|MSG_DONTWAIT);
+    data=json_pack("{s:i,s:f,s:f,s:f,s:i}","P_H",header,"P_X",x,"P_Y",y,"P_Z",z,"P_T",t);
+    buf=json_dumps(data,JSON_ENCODE_ANY);
+    send(socket,buf,strlen(buf),MSG_DONTROUTE|MSG_DONTWAIT);
 }
 
 /*
