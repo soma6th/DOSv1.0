@@ -10,30 +10,26 @@
 
 #include "TCP_Server.h"
 #include "UCP_Server.h"
-#include "Ctl.h"
-#include "Protocol.h"
-#include "Drone_Epoll.h"
+//#include "Ctl.h"
+//#include "Protocol.h"
 
 /*  UDP socket PORT number define */
-#define __CONTROL_PORT__ 5556       //about controller
-#define __STATUS_PORT__ 5554        //status data
-#define __VIDEO_PORT__ 5555         //camara data not used
-
+#define __UDP_PORT__ 8004
 /*  TCP socket PORT number define */
-#define __HANDLE_PORT__ 5559        //
+#define __TCP_PORT__ 8003        //
 
-
-#define __EPOLL__  0
-#define __POLLING__  1
+//#define __EPOLL__  0
+//#define __POLLING__  1
 
 //socket create and setting
 int network_init();
 
-//network communication model setting and run
-int network_run();
+int network_read(int socket,float* x,float* y,float* z,int* t);
+
+void network_write(int socket,float x,float y,float z,int t);
 
 //happening abnomal event, connection weak or network exit also network exit
-int network_exit();
+int network_exit(int tcp,int udp);
 
 //abnormal status handling function
 int network_error();

@@ -68,27 +68,28 @@ int CreateUDPServerSocket(unsigned short port)
  * port(상대 udp port번호를 알기 위한 변수)
  * @return: 실제로 연결된 client와 1:1로 연결되어 있는 TCP소켓 디스크립터
  */
-int Connected_UDP(int tcp,unsigned short port)
-{
+int Connected_UDP(unsigned short port)
+
     int udp;
-    int client_len;
     
     struct sockaddr_in udp_addr;
-	struct sockaddr_in con_addr;    
+	struct sockaddr_in con_addr;
+    
 	char buf[100];
 	int str_len;
 	int length;
+
 	memset(buf,0,sizeof(buf));
 
     // Create socket for incoming connections
     if((udp=socket(PF_INET,SOCK_DGRAM,0))<0)
         return -1;
-    
+
     //setting for 0
     memset(&udp_addr,0,sizeof(udp_addr));
     udp_addr.sin_family=AF_INET;
-	inet_aton("10.10.0.1",&udp_addr.sin_addr);
-    //udp_addr.sin_addr.s_addr=htonl(INADDR_ANY);
+	//inet_aton("10.10.0.1",&udp_addr.sin_addr);
+    udp_addr.sin_addr.s_addr=htonl(INADDR_ANY);
     udp_addr.sin_port=htons(port);
     
     //Bind to the local address
@@ -100,6 +101,7 @@ int Connected_UDP(int tcp,unsigned short port)
     
     memset(&con_addr,0,sizeof(con_addr));
 
+    //important if can't call, can't read client address
 	length=sizeof(con_addr);
 
 	str_len=recvfrom(udp,buf,100-1,0,(struct sockaddr*)&con_addr,&length);
@@ -115,14 +117,7 @@ int Connected_UDP(int tcp,unsigned short port)
 	printf("client ip is %s\n",inet_ntoa(con_addr.sin_addr));
 	printf("client port is %d %d\n",con_addr.sin_port,ntohs(con_addr.sin_port));
 
-	//str_len=recv(udp,buf,100-1,0);
-	//printf("in uu buf: %s\n",buf);
-
-	//buf[str_len]=0;
-	//send(udp,buf,100-1,0);
-	//printf("out uu buf: %s\n",buf);
-
-	return udp;
+    return udp;
 }
 
 
