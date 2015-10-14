@@ -1,67 +1,66 @@
+/*
+ * Protocol.h
+ *
+ * @date 2015/10/08
+ * @author Leejewoo
+ * @email nowwoo91@gmail.com
+ *
+ * Packet의 struct구조와, 데이터연산, flow에 대한 함수 선언
+ */
 
+#include<stdio.h>  /* for perror() */
+#include<stdlib.h> /* for exit() */
+#include<string.h> /* for memset() */
+#include<unistd.h>
+#include<stdint.h>
 
+/**
+ @struct  Packet
+ @date    2015/10/08
+ @author  이제우(wpdn006@gmail.com)
+ @brief   Packet의 구조
+ @warning
+ */
+typedef struct _PACKET_{
+	uint8_t	H; ///< Header 부분이다. 0xEE로 고정
+	uint8_t F; ///< flag부분이다. 이 flag를 통한 switch문으로 함수를 실행한다.
+	uint16_t S; ///< sequence 부분이다. 추후에 결정할 예정이다.
+	float X; ///< controll시에는 x축에 대한 데이터를 보낸다.
+	float Y; ///< controll시에는 y축에 대한 데이터를 보낸다.
+	float Z; ///< controll시에는 z축에 대한 데이터를 보낸다.
+	uint32_t T; ///< controll시에는 thoughput에 대한 데이터를 보낸다.
+    
+    // 다른 경우에는 X,Y,Z,T는 데이터를 실어보내는 역할을 한다.//
+}Packet;
 
-// Multiwii Serial Protocol 0
-#define MSP_VERSION              0
+// init, when TCP flag == 0
+int init_message(int socket,int version,int flag);
 
-//to multiwii developpers/committers : do not add new MSP messages without a proper argumentation/agreement on the forum
-#define MSP_IDENT                100   //out message         multitype + multiwii version + protocol version + capability variable
-#define MSP_STATUS               101   //out message         cycletime & errors_count & sensor present & box activation & current setting number
-#define MSP_RAW_IMU              102   //out message         9 DOF
-#define MSP_SERVO                103   //out message         8 servos
-#define MSP_MOTOR                104   //out message         8 motors
-#define MSP_RC                   105   //out message         8 rc chan and more
-#define MSP_RAW_GPS              106   //out message         fix, numsat, lat, lon, alt, speed, ground course
-#define MSP_COMP_GPS             107   //out message         distance home, direction home
-#define MSP_ATTITUDE             108   //out message         2 angles 1 heading
-#define MSP_ALTITUDE             109   //out message         altitude, variometer
-#define MSP_ANALOG               110   //out message         vbat, powermetersum, rssi if available on RX
-#define MSP_RC_TUNING            111   //out message         rc rate, rc expo, rollpitch rate, yaw rate, dyn throttle PID
-#define MSP_PID                  112   //out message         P I D coeff (9 are used currently)
-#define MSP_BOX                  113   //out message         BOX setup (number is dependant of your setup)
-#define MSP_MISC                 114   //out message         powermeter trig
-#define MSP_MOTOR_PINS           115   //out message         which pins are in use for motors & servos, for GUI
-#define MSP_BOXNAMES             116   //out message         the aux switch names
-#define MSP_PIDNAMES             117   //out message         the PID names
-#define MSP_WP                   118   //out message         get a WP, WP# is in the payload, returns (WP#, lat, lon, alt, flags) WP#0-home, WP#16-poshold
-#define MSP_BOXIDS               119   //out message         get the permanent IDs associated to BOXes
+int convert_message(char* buf);
 
-#if defined(AIR)
-#define MSP_SET_RAW_RC_SERIAL      150   //in message          4 rc chan
-#define MSP_ARM                  151
-#define MSP_DISARM               152
-#define MSP_TRIM_UP              153
-#define MSP_TRIM_DOWN            154
-#define MSP_TRIM_LEFT            155
-#define MSP_TRIM_RIGHT           156
-#define MSP_TRIM_UP_FAST         157
-#define MSP_TRIM_DOWN_FAST       158
-#define MSP_TRIM_LEFT_FAST       159
-#define MSP_TRIM_RIGHT_FAST      160
+// network to host byte order for float
+float ntohf(float f);
 
-#define MSP_AIR             199
-#endif
+// host to network byte order for float
+float htonf(float f);
 
-#define MSP_SET_RAW_RC           200   //in message          8 rc chan
-#define MSP_SET_RAW_GPS          201   //in message          fix, numsat, lat, lon, alt, speed
-#define MSP_SET_PID              202   //in message          P I D coeff (9 are used currently)
-#define MSP_SET_BOX              203   //in message          BOX setup (number is dependant of your setup)
-#define MSP_SET_RC_TUNING        204   //in message          rc rate, rc expo, rollpitch rate, yaw rate, dyn throttle PID
-#define MSP_ACC_CALIBRATION      205   //in message          no param
-#define MSP_MAG_CALIBRATION      206   //in message          no param
-#define MSP_SET_MISC             207   //in message          powermeter trig + 8 free for future use
-#define MSP_RESET_CONF           208   //in message          no param
-#define MSP_SET_WP               209   //in message          sets a given WP (WP#,lat, lon, alt, flags)
-#define MSP_SELECT_SETTING       210   //in message          Select Setting Number (0-2)
-#define MSP_SET_HEAD             211   //in message          define a new heading hold direction
+// enddian check function
+int endian_check();
 
-#define MSP_BIND                 240   //in message          no param
+// buf->Packet(struct)
+Packet string_to_struct(char* buf);
 
-#define MSP_EEPROM_WRITE         250   //in message          no param
+// Packet(struct)->buf
+void struct_to_string(Packet packet.char *buf);
 
-#define MSP_DEBUGMSG             253   //out message         debug string buffer
-#define MSP_DEBUG                254   //out message         debug1,debug2,debug3,debug4
+// print char array
+void print_buf(char* buf);
 
+// print struct
+void print_packet(Packet packet);
 
+// controll packet receive function
+void recv_control(int socket);
 
-int init_message();
+// status packet send function
+void send_status(int socket);

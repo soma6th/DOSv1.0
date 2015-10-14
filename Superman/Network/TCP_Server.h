@@ -1,3 +1,13 @@
+/*
+ * TCP_Server.h
+ *
+ * @date 2015/10/01
+ * @author Leejewoo
+ * @email nowwoo91@gmail.com
+ *
+ * TCP_Socket의 생성과 connect관련한 함수 선언
+ */
+
 #include <stdio.h>      /* for printf() and fprintf() */
 #include <sys/socket.h> /* for socket(), bind(), and connect() */
 #include <arpa/inet.h>  /* for sockaddr_in and inet_ntoa() */
@@ -5,7 +15,17 @@
 #include <string.h>     /* for memset() */
 #include <unistd.h>     /* for close() */
 
-void DieWithError(char *errorMessage);  /* Error handling function */
-void HandleTCPClient(int clntSocket);   /* TCP client handling function */
-int CreateTCPServerSocket(unsigned short port); /* Create TCP server socket */
-int AcceptTCPConnection(int servSock);  /* Accept TCP connection request */
+// Error handling function
+void DieWithError(char *errorMessage);
+
+// TCP client handling function
+void HandleTCPClient(int clntSocket);
+
+// Create TCP server socket
+int CreateTCPServerSocket(unsigned short port);
+
+// Accept TCP connection request
+int AcceptTCPConnection(int servSock);
+
+// return 1:1 connect socket discriptor
+int TCP_connect(unsigned short port);

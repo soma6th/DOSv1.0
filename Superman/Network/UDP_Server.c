@@ -1,65 +1,149 @@
+/*
+ * UCP_Server.c
+ *
+ * @date 2015/10/08
+ * @author Leejewoo
+ * @email nowwoo91@gmail.com
+ *
+ * UDP_Socket의 생성과 해당 디스크립터 반환
+ */
+
 #include <sys/socket.h> /* for socket(), bind(), and connect() */
 #include <arpa/inet.h>  /* for sockaddr_in and inet_ntoa() */
 #include <string.h>     /* for memset() */
 #include <stdio.h>  /* for perror() */
 #include <stdlib.h> /* for exit() */
 
-
 #define MAXPENDING 100    /* Maximum outstanding connection requests */
-#define RCVBUFSIZE 32   /* Size of receive buffer */
-
-void DieWithError(char *errorMessage)
-{
-    perror(errorMessage);
-    exit(1);
-}
+#define UDPBUFSIZE 32   /* Size of receive buffer */
 
 
+/*
+ * @function : UDP socket을 생성하기 위한 함수 socket->bind까지
+ * @param: port(해당 포트번호로 UDP server socket을 생성하기 위한 변수)
+ * @return: 생성된 소켓의 디스크립터 -1일때는 socket 생성실패, 0일경우는
+ * bind에러
+ */
 int CreateUDPServerSocket(unsigned short port)
 {
     int sock;                        /* socket to create */
-    struct sockaddr_in echoServAddr; /* Local address */
+    struct sockaddr_in ServAddr; /* Local address */
     
     /* Create socket for incoming connections */
     if ((sock = socket(PF_INET, SOCK_DGRAM, 0)) < 0)
-        DieWithError("socket() failed");
-    
+    {
+        return -1;
+    }
     /* Construct local address structure */
-    memset(&echoServAddr, 0, sizeof(echoServAddr));   /* Zero out structure */
-    echoServAddr.sin_family = AF_INET;                /* Internet address family */
-    echoServAddr.sin_addr.s_addr = htonl(INADDR_ANY); /* Any incoming interface */
-    echoServAddr.sin_port = htons(port);              /* Local port */
+    memset(&ServAddr, 0, sizeof(ServAddr));   /* Zero out structure */
+    ServAddr.sin_family = AF_INET;                /* Internet address family */
+    ServAddr.sin_addr.s_addr = htonl(INADDR_ANY); /* Any incoming interface */
+    ServAddr.sin_port = htons(port);              /* Local port */
     
     /* Bind to the local address */
-    if (bind(sock, (struct sockaddr *) &echoServAddr, sizeof(echoServAddr)) < 0)
-        DieWithError("bind() failed");
+    if (bind(sock, (struct sockaddr *) &ServAddr, sizeof(ServAddr)) < 0)
+    {
+        return 0;
+    }
     
     return sock;
 }
 
 
-
-void HandleUDPClient(int clntSocket)
+/*
+ * @function : 만약에 1:1로 계속 왔다갔다하는 UDP socket을 생성하게 된다면,
+ * 그냥 socket을 생성하는것보다, connected udp를 열게 되면, UDP socket에
+ * IP와 PORT번호 정보가 등록되어, 성능향상을 기대 할 수 있다. 또한 기존의 UDP함수가
+ * recvfrom이나, sendto를 사용했던것에 반해 read,write함수를 사용 가능하므로,
+ * 실제 코드의 효율성도 증가함으로, UDP는 생성하자마자 connected udp를 지향한다.
+ *
+ * @param: tcp(getpeername으로 상대방의 ip를 확인하기 위한 변수)
+ * port(상대 udp port번호를 알기 위한 변수)
+ * @return: 실제로 연결된 client와 1:1로 연결되어 있는 TCP소켓 디스크립터
+ */
+int Connected_UDP(int tcp,unsigned short port)
 {
-    char echoBuffer[RCVBUFSIZE];        /* Buffer for echo string */
-    int recvMsgSize;                    /* Size of received message */
-    int client_len;                     /* client clientaddr size */
+    int udp;
+    int client_len;
     
-    struct sockaddr_in clientaddr;      /* send clientaddr */
+    struct sockaddr_in udp_addr;
     
-    //UDP socket don't divide message, so 1 call recvfrom , 1 call sendto
+    // Create socket for incoming connections
+    if((udp=socket(PF_INET,SOCK_DGRAM,0))<0)
+        return -1;
     
-    /* Receive message from client */
-    if ((recvMsgSize = recvfrom(clntSocket, echoBuffer, RCVBUFSIZE, 0,
-                                (struct sockaddr*)&clientaddr,&client_len)) < 0)
-        DieWithError("recv() failed");
+    //setting for 0
+    memset(&udp_addr,0,sizeof(udp_addr));
+    udp_addr.sin_family=AF_INET;
+    udp_addr.sin_addr.s_addr=htonl(INADDR_ANY);
+    udp_addr.sin_port=htons(port);
     
-
-    /* Echo message back to client */
-    if (sendto(clntSocket, echoBuffer, recvMsgSize, 0,
-               (struct sockaddr*)&clientaddr,client_len) != recvMsgSize)
-            DieWithError("send() failed");
+    //Bind to the local address
+    if (bind(udp,(struct sockaddr *) &udp_addr, sizeof(udp_addr)) < 0)
+        return 0;
     
-    close(clntSocket);    /* Close client socket */
+    memset(&udp_addr,0,sizeof(udp_addr));
+    getpeername(tcp,(struct sockaddr*)&udp_addr,&client_len);
+    
+    if(connect(udp,(struct sockaddr*)&udp_addr,sizeof(udp_addr))<0)
+    {
+        printf("udp connect error\n");
+        exit(1);
+    }
+    
+    printf("client ip is %s\n",inet_ntoa(udp_addr.sin_addr));
+    printf("client port is %d %d\n",udp_addr.sin_port,ntohs(udp_addr.sin_port));
+    
+    return udp;
 }
 
+/*
+ * @function : 만약에 1:1로 계속 왔다갔다하는 UDP socket을 생성하게 된다면,
+ * 그냥 socket을 생성하는것보다, connected udp를 열게 되면, UDP socket에
+ * IP와 PORT번호 정보가 등록되어, 성능향상을 기대 할 수 있다. 또한 기존의 UDP함수가
+ * recvfrom이나, sendto를 사용했던것에 반해 read,write함수를 사용 가능하므로,
+ * 실제 코드의 효율성도 증가함으로, UDP는 생성하자마자 connected udp를 지향한다.
+ *
+ * @param: tcp(getpeername으로 상대방의 ip를 확인하기 위한 변수)
+ * port(상대 udp port번호를 알기 위한 변수)
+ * @return: 실제로 연결된 client와 1:1로 연결되어 있는 TCP소켓 디스크립터
+ */
+int Connected_UDP1(int tcp,unsigned short port)
+{
+    int udp;
+    int client_len;
+    
+    struct sockaddr_in udp_addr;
+    
+    // Create socket for incoming connections
+    if((udp=socket(PF_INET,SOCK_DGRAM,0))<0)
+        return -1;
+    
+    //setting for 0
+    memset(&udp_addr,0,sizeof(udp_addr));
+    udp_addr.sin_family=AF_INET;
+    udp_addr.sin_addr.s_addr=htonl(INADDR_ANY);
+    udp_addr.sin_port=htons(port);
+    
+    //Bind to the local address
+    if (bind(udp,(struct sockaddr *) &udp_addr, sizeof(udp_addr)) < 0)
+        return 0;
+    
+    memset(&udp_addr,0,sizeof(udp_addr));
+    //getpeername(tcp,(struct sockaddr*)&udp_addr,&client_len);
+    
+    udp_addr.sin_family=AF_INET;
+    udp_addr.sin_addr.s_addr=htonl(INADDR_ANY);
+    udp_addr.sin_port=htons(port);
+    
+    if(connect(udp,(struct sockaddr*)&udp_addr,sizeof(udp_addr))<0)
+    {
+        printf("udp connect error\n");
+        exit(1);
+    }
+    
+    printf("client ip is %s\n",inet_ntoa(udp_addr.sin_addr));
+    printf("client port is %d %d\n",udp_addr.sin_port,ntohs(udp_addr.sin_port));
+    
+    return udp;
+}

@@ -1,25 +1,59 @@
+/*
+ * network.c
+ *
+ * @date 2015/10/08
+ * @author Leejewoo
+ * @email nowwoo91@gmail.com
+ *
+ * network의 선언을 간단하게 만들기 위한 함수.
+ */
 
 
+#include <stdio.h>      /* for printf() and fprintf() */
 
 
-
+/*
+ * @function :
+ * @param:
+ * waring:
+ */
 int network_init()
 {
-    int handling_fd,status_fd,control_fd;
+    int tcp;
     
-    //socket create 부분
-    /*handling을 위한 TCP socket 1개 생성과 controller에서 데이터를 전송받는것과 status를 받기 위한 UDP socket 2개*/
-    hangling_fd=create_handling_socket();
-    status_fd=create_status_socket();
-    control_fd=create_control_socket();
+    tcp=TCP_connect(port);
     
-    //socket 통신 방식, multi threading과, multiplexing 방식중 선택
-    
-    //만약 epoll이라면
-    //epoll_setting
-    epoll_init();
-    
-    //network loop
-    epoll_mode();
     
 }
+
+/*
+ * @function :
+ * @param:
+ * waring:
+ */
+int network_run()
+{
+    
+}
+
+/*
+ * @function :
+ * @param:
+ * waring:
+ */
+int network_exit()
+{
+    
+}
+
+/*
+ * @function :
+ * @param:
+ * waring:
+ */
+int network_error()
+{
+    
+}
+
+

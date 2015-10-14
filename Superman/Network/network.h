@@ -1,4 +1,18 @@
-#include"Drone_Epoll.h"
+/*
+ * Drone_Epoll.h
+ *
+ * @date 2015/10/08
+ * @author Leejewoo
+ * @email nowwoo91@gmail.com
+ *
+ * 패킷을 받는 방법에 대한 방법론중, epoll에 관련된 함수의 선언
+ */
+
+#include "TCP_Server.h"
+#include "UCP_Server.h"
+#include "Ctl.h"
+#include "Protocol.h"
+#include "Drone_Epoll.h"
 
 /*  UDP socket PORT number define */
 #define __CONTROL_PORT__ 5556       //about controller
@@ -9,23 +23,17 @@
 #define __HANDLE_PORT__ 5559        //
 
 
-typedef struct __CONTROL_DATA_FORMAT__ {
-    uint8_t tag;
-    uint8_t size;
-} __attribute__ ((packed)) controll_Format;
+#define __EPOLL__  0
+#define __POLLING__  1
 
-typedef struct __STATUS_DATA_FORMAT__ {
-    uint8_t tag;
-    uint8_t size;
-} __attribute__ ((packed)) status_Format;
-
-typedef struct __HANDLE_DATA_FORMAT__ {
-    uint8_t tag;
-    uint8_t size;
-} __attribute__ ((packed)) handle_Format;
-
-
+//socket create and setting
 int network_init();
+
+//network communication model setting and run
 int network_run();
+
+//happening abnomal event, connection weak or network exit also network exit
 int network_exit();
+
+//abnormal status handling function
 int network_error();
