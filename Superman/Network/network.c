@@ -21,31 +21,26 @@
  * @param:
  * waring:
  */
-int network_init()
+int network_init(int* tcp,int* udp)
 {
-    char buf[MAXBUFF];
-    int tcp;
-    int udp;
+    char buf;
     //create tcp socket
-    tcp=TCP_connect(__TCP_PORT__);
-
-    memset(buf,0,sizeof(buf));
-    recv(tcp,buf,MAXBUFF-1,0);
-    printf("r buf: %s\n",buf);
-    send(tcp,buf,MAXBUFF-1,0);
-    printf("s buf: %s\n",buf);
-    recv(tcp,buf,MAXBUFF-1,0);
-    printf("r buf: %s\n",buf);
-    
-    udp=Connected_UDP(__UDP_PORT__);
-    if(udp<2)
+    *tcp=TCP_connect_init(__TCP_PORT__);
+    if(*tcp<2)
     {
-        printf("socket create error\n");
-        exit(1);
+        printf("tcp init error\n");
+        return -1;
     }
-    printf("tcp_sock: %d udp_sock: %d\n",tcp,udp);
     
-    return udp;
+    *udp=UDP_connect_init(__UDP_PORT__);
+    if(*udp<2)
+    {
+        printf("udp init error\n");
+		return -1;
+    }
+    
+    printf("init complete T:%d U:%d\n",*tcp,*udp);
+	return 0;
 }
 
 /*
@@ -53,7 +48,7 @@ int network_init()
  * @param:
  * waring:
  */
-int network_read(int socket,float* x,float* y,float* z,int* t)
+int json_read(int socket,double* x,double* y,double* z,int* t)
 {
     char buf[MAXBUFF];
     int header,str_len;
@@ -80,7 +75,7 @@ int network_read(int socket,float* x,float* y,float* z,int* t)
  * @param:
  * waring:
  */
-void network_write(int socket,float x,float y,float z,int t)
+void json_write(int socket,double x,double y,double z,int t)
 {
     char *buf;
     int header=2;
@@ -104,5 +99,15 @@ int network_exit(int tcp,int udp)
     return 0;
 }
 
-
+int tcp_read(int socket)
+{
+    char flag;
+    if(recv(socket,&flag,1,MSG_DONTROUTE|MSG_DONTWAIT)==1)
+    {
+        printf("tcp flag is %d\n",flag);
+        return flag;
+    }
+    
+    return -1;
+}
 

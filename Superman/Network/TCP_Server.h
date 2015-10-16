@@ -28,4 +28,4 @@ int CreateTCPServerSocket(unsigned short port);
 int AcceptTCPConnection(int servSock);
 
 // return 1:1 connect socket discriptor
-int TCP_connect(unsigned short port);
+int TCP_connect_init(unsigned short port);

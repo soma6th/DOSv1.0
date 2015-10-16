@@ -96,15 +96,26 @@ int AcceptTCPConnection(int servSock)
  * @param: port(Server Socket을 열기위한 port number)
  * @return: 실제로 연결된 client와 1:1로 연결되어 있는 TCP소켓 디스크립터
  */
-int TCP_connect(unsigned short port)
+int TCP_connect_init(unsigned short port)
 {
 	int serv_sock;
 	int clnt_sock;
+    char buf;
 	serv_sock=CreateTCPServerSocket(port);
 
 	clnt_sock=AcceptTCPConnection(serv_sock);
 
 	close(serv_sock);
 
+    buf=1;
+    send(clnt_sock,&buf,1,0);
+    recv(clnt_sock,&buf,1,0);
+    send(clnt_sock,&buf,1,0);
+    if(buf!=1)
+    {
+        printf("tcp init error\n");
+        return -1;
+    }
+    
 	return clnt_sock;
 }

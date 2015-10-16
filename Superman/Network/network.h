@@ -22,11 +22,13 @@
 //#define __POLLING__  1
 
 //socket create and setting
-int network_init();
+int network_init(int* tcp,int* udp);
 
-int network_read(int socket,float* x,float* y,float* z,int* t);
+int json_read(int socket,double* x,double* y,double* z,int* t);
 
-void network_write(int socket,float x,float y,float z,int t);
+void json_write(int socket,double x,double y,double z,int t);
+
+int tcp_read(int socket);
 
 //happening abnomal event, connection weak or network exit also network exit
 int network_exit(int tcp,int udp);

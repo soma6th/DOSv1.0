@@ -19,4 +19,4 @@
 /// Create UDP server socket
 int CreateUDPServerSocket(unsigned short port);
 /// connected UDP socket setting
-int Connected_UDP(unsigned short port);
+int UDP_connect_init(unsigned short port);

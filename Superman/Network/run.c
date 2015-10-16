@@ -2,16 +2,23 @@
 
 int main(int argc,char* argv[])
 {
-	int socket;
-	int flag,i;
-	float x,y,z;
-	int t;
+    int tcp,udp,t;
+    int flag,i;
+    double x,y,z;
+    char test_char;
+	if(network_init(&tcp,&udp)==-1)
+    {
+        printf("socket init error\n");
+        return 0;
+    }
 
-	socket=network_init();
-
+    x=10; y=20; z=30; t=40;
+    
 	for(i=0;i<10;i++)
 	{
-		flag=network_read(socket,&x,&y,&z,&t);
+        test_char=tcp_read(tcp);
+        json_write(udp,x,y,z,t);
+		flag=json_read(udp,&x,&y,&z,&t);
 	}
 	
 	return 0;

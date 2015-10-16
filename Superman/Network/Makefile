@@ -1,8 +1,8 @@
-all: test
+all: run
 
-test: 
-	gcc -o test TCP_Server.c UDP_Server.c Protocol.c ctl.c test.c
+run: 
+	gcc -o run TCP_Server.c UDP_Server.c network.c ctl.c run.c -ljansson
 
 clean:
-	rm -r test
+	rm -r run
 
