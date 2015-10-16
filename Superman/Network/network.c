@@ -63,7 +63,7 @@ int json_read(int socket,double* x,double* y,double* z,int* t)
     
     if((json_unpack(data,"{s:i,s:f,s:f,s:f,s:i}","P_H",&header,"P_X",x,"P_Y",y,"P_Z",z,"P_T",t))!=0)
     {
-        printf("json_unpack fail\n");
+        //printf("json_unpack fail\n");
         return 0;
     }
     
@@ -101,13 +101,17 @@ int network_exit(int tcp,int udp)
 
 int tcp_read(int socket)
 {
-    char flag;
-    if(recv(socket,&flag,1,MSG_DONTROUTE|MSG_DONTWAIT)==1)
+    char flag=0;
+    int length;
+    length=recv(socket,&flag,1,MSG_DONTROUTE|MSG_DONTWAIT);
+    if(length==1)
     {
-        printf("tcp flag is %d\n",flag);
-        return flag;
+        if(flag)
+        {
+            printf("tcp data: %d\n",flag);
+            return flag;
+        }
     }
-    
     return -1;
 }
 
