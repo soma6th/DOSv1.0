@@ -57,17 +57,21 @@ int json_read(int socket,double* x,double* y,double* z,int* t)
     
     memset(buf,0,sizeof(buf));
     str_len=recv(socket,buf,MAXBUFF-1,MSG_DONTROUTE|MSG_DONTWAIT);
-    buf[str_len]=0;
-    
+    if(str_len==-1)
+	{
+		return 0;
+	}
+	buf[str_len]=0;
+	printf("control data: %s\n",buf);
     data=json_loads(buf,JSON_DECODE_ANY,&error);
-    
     if((json_unpack(data,"{s:i,s:f,s:f,s:f,s:i}","P_H",&header,"P_X",x,"P_Y",y,"P_Z",z,"P_T",t))!=0)
     {
         //printf("json_unpack fail\n");
-        return 0;
+        return -1;
     }
-    
-    return -1;
+	printf("data read success\n");
+    return 1;
+
 }
 
 /*
