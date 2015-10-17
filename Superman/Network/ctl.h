@@ -15,3 +15,5 @@ void get_string_access_mode(int val,char* ret);
 int async_test(int fd,int flag);
 
 int change_mode(int socket);
+
+int sock_reuse(int socket);

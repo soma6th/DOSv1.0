@@ -10,6 +10,7 @@
 
 #include <sys/socket.h> /* for socket(), bind(), and connect() */
 #include <arpa/inet.h>  /* for sockaddr_in and inet_ntoa() */
+#include <unistd.h>
 #include <string.h>     /* for memset() */
 #include <stdio.h>  /* for perror() */
 #include <stdlib.h> /* for exit() */
