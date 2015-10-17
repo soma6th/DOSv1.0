@@ -24,5 +24,6 @@ class PID{
         int init();
         void setTuning(float kd, float ki, float kp);
         int calcPID(float aimVal, float inVal);
+        void initKpid(float kd, float ki, float kp);
         
 };

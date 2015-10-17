@@ -5,10 +5,15 @@ PID::PID()
 {
 }
 
-
+/*
+ *  init()
+ *  @function init member variables
+ *  @param void 
+ *  @return void
+ */
 int PID::init()
 {
- 
+
     Kd = 0.f;
     Ki = 0.f;
     Kp = 0.f;
@@ -23,10 +28,18 @@ int PID::init()
 
     dt = 0.01f;
     P_pid_prev = 0.f;
- 
+
 }
 
-
+/*
+ *  calcPID(float, float)
+ *  @function Calculation pid ( input to aim value )
+ *  @param 
+ *      aimVal : aim that we want tilt
+ *      inVal  : current tilt
+ *  @return
+ *      int : integer value that motor power
+ */
 int PID::calcPID(float aimVal, float inVal)
 {
     int output;
@@ -39,20 +52,41 @@ int PID::calcPID(float aimVal, float inVal)
 
     D_err = ( P_pid - P_pid_prev ) / dt;
     D_pid = D_err * Kd;
-    
+
 
     P_pid_prev = P_pid;
 
 
-//    printf("[p] = %f, [I] = %f, [D] = %f\n", P_pid, I_pid, D_pid);
+    //    printf("[p] = %f, [I] = %f, [D] = %f\n", P_pid, I_pid, D_pid);
     output =P_pid + I_pid  +  D_pid; 
-    
+
     return output;
 }
+
+/*
+ *  setTuning(float, float, float)
+ *  @function set pid constant for calculating 
+ *  @param
+ *      kp : p constant
+ *      ki : i constant
+ *      kd : d constant
+ * 
+ */
 
 void PID::setTuning(float kp, float ki, float kd)
 {
     Kp = kp;
     Ki = ki;
     Kd = kd;
+}
+
+/*
+ *  initKpid(float, float, float)
+ *  @function changing pid constant during executing program
+ *  
+ */
+void PID::initKpid(float kp, float ki, float kd)
+{
+    init();
+    setTuning(kp, ki, kd);
 }
