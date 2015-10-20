@@ -29,6 +29,9 @@ int PID::init()
     dt = 0.01f;
     P_pid_prev = 0.f;
 
+    gettimeofday(&start_point, NULL);
+    gettimeofday(&end_point, NULL);
+
 }
 
 /*
@@ -42,6 +45,14 @@ int PID::init()
  */
 int PID::calcPID(float aimVal, float inVal)
 {
+    gettimeofday(&end_point, NULL);
+
+    dt = (double)(end_point.tv_sec)+(double)(end_point.tv_usec)/1000000.0-(double)(start_point.tv_sec)-(double)(start_point.tv_usec)/1000000.0;
+
+    if(dt > 1) dt = 0.001;
+
+    gettimeofday(&start_point, NULL);
+
     int output;
 
     P_err = aimVal - inVal;

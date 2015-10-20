@@ -1,3 +1,5 @@
+#include <sys/time.h>
+
 class PID{
 
     private:
@@ -16,6 +18,9 @@ class PID{
 
         float dt;
         float P_pid_prev;
+
+        struct timeval start_point, end_point;
+
 
     public:
 
