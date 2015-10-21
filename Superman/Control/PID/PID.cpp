@@ -58,18 +58,18 @@ int PID::calcPID(float aimVal, float inVal)
     P_err = aimVal - inVal;
     P_pid = P_err * Kp;
 
-    I_err += P_pid * dt;
+    I_err += P_err * dt;
     I_pid = I_err * Ki;
 
-    D_err = ( P_pid - P_pid_prev ) / dt;
+    D_err = ( P_err - P_err ) / dt;
     D_pid = D_err * Kd;
 
 
-    P_pid_prev = P_pid;
+    P_pid_prev = P_err;
 
 
     //    printf("[p] = %f, [I] = %f, [D] = %f\n", P_pid, I_pid, D_pid);
-    output =P_pid + I_pid  +  D_pid; 
+    output = P_pid + I_pid  +  D_pid; 
 
     return output;
 }
