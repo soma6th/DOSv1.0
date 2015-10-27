@@ -14,7 +14,7 @@
 #include <string.h>     /* for memset() */
 #include <stdio.h>  /* for perror() */
 #include <stdlib.h> /* for exit() */
-#include "ctl.h"
+#include "ctl.c"
 
 #define MAXPENDING 100    /* Maximum outstanding connection requests */
 #define RCVBUFSIZE 32   /* Size of receive buffer */

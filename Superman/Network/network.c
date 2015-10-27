@@ -12,7 +12,6 @@
 #include <stdio.h>      /* for printf() and fprintf() */
 #include <unistd.h>
 #include <jansson.h>
-#include "network.h"
 
 #define MAXBUFF 150
 

@@ -8,8 +8,8 @@
  * 패킷을 받는 방법에 대한 방법론중, epoll에 관련된 함수의 선언
  */
 
-#include "TCP_Server.h"
-#include "UDP_Server.h"
+#include "TCP_Server.c"
+#include "UDP_Server.c"
 #include <jansson.h>
 //#include "Ctl.h"
 //#include "Protocol.h"
@@ -19,6 +19,8 @@
 /*  TCP socket PORT number define */
 #define __TCP_PORT__ 8003        //
 
+
+#include "network.c"
 //#define __EPOLL__  0
 //#define __POLLING__  1
 
