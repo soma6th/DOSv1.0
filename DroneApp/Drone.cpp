@@ -1,11 +1,7 @@
 #define _EMAX_30A_ESC_
-
 #define _MPU6050_
 
-#include "Sensor/Sensor.h"
-#include "Motor/Motor.h"
-#include "../Network/network.h"
-#include "PID/PID.h"
+#include "../Superman/Drone.h"
 #include <stdio.h>
 #include <signal.h>
 #include <time.h>

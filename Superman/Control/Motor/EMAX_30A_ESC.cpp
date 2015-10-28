@@ -72,7 +72,7 @@ void Motor::calibration()
     printf("Start Cali!!\n");
     softPwmWrite(pin, 40);
 
-    sleep(5);
+    delay(5000);
 
     printf("Finish Cali!!\n");
     softPwmWrite(pin, 0);
