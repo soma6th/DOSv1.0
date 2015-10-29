@@ -20,17 +20,6 @@
 #define RCVBUFSIZE 32   /* Size of receive buffer */
 
 /*
- * @function : error message와 함께, 프로세스 종료
- * @param: errorMessage(해당하는 메세지를 터미널에 출력하기 위한 변수)
- * @return: void
- */
-void DieWithError(char *errorMessage)
-{
-    perror(errorMessage);
-    exit(1);
-}
-
-/*
  * @function : ServerSocket을 생성하기 위한 함수 socket->bind->listen까지
  * @param: port(해당 포트번호로 Tcp server socket을 생성하기 위한 변수)
  * @return: 생성된 소켓의 디스크립터 -1일때는 socket 생성실패, 0일경우는
@@ -43,8 +32,10 @@ int CreateTCPServerSocket(unsigned short port)
     
     /* Create socket for incoming connections */
     if ((sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
-        DieWithError("socket() failed");
-    
+	{
+		perror("socket() failed\n");
+		exit(8003);
+	}
     sock_reuse(sock);
     /* Construct local address structure */
     memset(&echoServAddr, 0, sizeof(echoServAddr));   /* Zero out structure */
@@ -54,12 +45,16 @@ int CreateTCPServerSocket(unsigned short port)
     
     /* Bind to the local address */
     if (bind(sock, (struct sockaddr *) &echoServAddr, sizeof(echoServAddr)) < 0)
-        DieWithError("bind() failed");
-    
+	{
+        perror("bind() failed\n");
+		exit(8003);
+	}
     /* Mark the socket so it will listen for incoming connections */
     if (listen(sock, MAXPENDING) < 0)
-        DieWithError("listen() failed");
-    
+	{
+        perror("listen() failed\n");
+		exit(8003);
+	}
     return sock;
 }
 
@@ -80,8 +75,10 @@ int AcceptTCPConnection(int servSock)
     /* Wait for a client to connect */
     if ((clntSock = accept(servSock, (struct sockaddr *) &echoClntAddr,
                            &clntLen)) < 0)
-        DieWithError("accept() failed");
-    
+	{
+        perror("accept() failed\n");
+		exit(8003);
+	}
     /* clntSock is connected to a client! */
     
     printf("Handling client %s\n", inet_ntoa(echoClntAddr.sin_addr));

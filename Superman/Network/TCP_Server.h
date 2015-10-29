@@ -15,9 +15,6 @@
 #include <string.h>     /* for memset() */
 #include <unistd.h>     /* for close() */
 
-// Error handling function
-void DieWithError(char *errorMessage);
-
 // TCP client handling function
 void HandleTCPClient(int clntSocket);
 

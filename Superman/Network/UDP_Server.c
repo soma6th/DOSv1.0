@@ -36,7 +36,8 @@ int CreateUDPServerSocket(unsigned short port)
     /* Create socket for incoming connections */
     if ((sock = socket(PF_INET, SOCK_DGRAM, 0)) < 0)
     {
-        return -1;
+		perror("UDP socket create error\n");
+        exit(8004);
     }
     /* Construct local address structure */
     memset(&ServAddr, 0, sizeof(ServAddr));   /* Zero out structure */
@@ -47,7 +48,8 @@ int CreateUDPServerSocket(unsigned short port)
     /* Bind to the local address */
     if (bind(sock, (struct sockaddr *) &ServAddr, sizeof(ServAddr)) < 0)
     {
-        return 0;
+		perror("UDP socket bind error\n");
+        exit(8004);
     }
 
 	printf("Create socket: %s:%d\n",inet_ntoa(ServAddr.sin_addr),ntohs(ServAddr.sin_port));
@@ -80,8 +82,10 @@ int UDP_connect_init(unsigned short port)
 
 	memset(buf,0,sizeof(buf));
 	if((udp=socket(PF_INET,SOCK_DGRAM,0))<0)
-		return -1;
-
+	{
+		perror("udp socket create error\n");
+		exit(8004);
+	}
 	//setting for 0
 	memset(&udp_addr,0,sizeof(udp_addr));
 	udp_addr.sin_family=AF_INET;
@@ -91,8 +95,10 @@ int UDP_connect_init(unsigned short port)
 
 	//Bind to the local address
 	if (bind(udp,(struct sockaddr *) &udp_addr, sizeof(udp_addr)) < 0)
-		return 0;
-
+	{
+		perror("UDP socket bind error\n");
+		exit(8004);
+	}
 	printf("server ip is %s\n",inet_ntoa(udp_addr.sin_addr));
 	printf("server port is %d %d\n",udp_addr.sin_port,ntohs(udp_addr.sin_port));
 
