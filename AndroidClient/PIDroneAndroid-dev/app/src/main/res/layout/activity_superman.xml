@@ -33,9 +33,7 @@
         android:layout_alignParentTop="true"
         android:layout_marginStart="21dp"
         android:layout_alignParentStart="false"
-        android:layout_alignParentEnd="true">
-
-    </RelativeLayout>
+        android:layout_alignParentEnd="true"/>
 
     <LinearLayout
         android:orientation="vertical"
