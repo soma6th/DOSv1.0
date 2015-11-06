@@ -286,7 +286,7 @@ int wiringPiI2CWriteBytes(int fd, uint8_t devAddr, uint8_t regAddr, uint8_t leng
   dataW.nmsgs = 1;
   dataW.msgs = msg;
 
-  dataW.msgs[0].addr = 0x68;
+  dataW.msgs[0].addr = devAddr;
   dataW.msgs[0].flags = 0;
   dataW.msgs[0].len = sizeof(write_data);
   dataW.msgs[0].buf = write_data;

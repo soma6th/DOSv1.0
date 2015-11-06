@@ -1,5 +1,5 @@
-#ifdef _MPU6050_
-#include "MPU6050/MPU6050.cpp"
+#ifdef _MPU6050_HMC5883L_
+#include "MPU6050_HMC5883L_IMU.cpp"
 #endif
 
 #ifdef _BMP180_
