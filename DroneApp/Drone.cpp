@@ -1,5 +1,5 @@
 #define _EMAX_30A_ESC_
-#define _MPU6050_
+#define _MPU6050_HMC5883L_
 
 #include "../Superman/Drone.h"
 #include <stdio.h>
