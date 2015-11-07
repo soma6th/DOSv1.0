@@ -1,4 +1,4 @@
-#define _EMAX_30A_ESC_
+#define _MN2214_ESC_
 #define _MPU6050_
 
 #include "../Superman/Drone.h"
@@ -37,11 +37,12 @@ int main(int argc, char* argv[])
     motor[2].setPin(24);
     motor[3].setPin(25);
 
+    /*
     motor[0].calibration();
     motor[1].calibration();
     motor[2].calibration();
     motor[3].calibration();
-
+    */
 
     if(imu.init())
     {
@@ -63,10 +64,11 @@ int main(int argc, char* argv[])
 
     rollPid.setTuning(kp, ki, kd);
     pitchPid.setTuning(kp, ki, kd);
-   // 0.61 , 0.09, 0.16
+   yawPid.setTuning(kp, ki, kd);
+    // 0.61 , 0.09, 0.16
 
-    float roll, pitch, yaw=0;
-    int pidRoll, pidPitch, pidYaw=0;
+    float roll, pitch, yaw;
+    int pidRoll, pidPitch, pidYaw;
 
     imu.calibration();
 
@@ -91,6 +93,7 @@ int main(int argc, char* argv[])
     int tmpP = 0;
     int tmpY = 0;
 
+    int Emergency = 0;
 
     while(1)
     {
@@ -103,34 +106,34 @@ int main(int argc, char* argv[])
         {
             //   printf("control data: %.2f %.2f %.2f %d\n",x,y,z,t);
 
-            throttle = t/10;
+            throttle = t;
         }
 
         imu.getIMUData(&pitch, &roll, &yaw);
 
+        if( pitch < -40 || pitch > 40 || roll < -40 || roll > 40)
+        {
+                Emergency = 1;
+        }
+
         //yaw=0;
         //       json_write(udp,roll,pitch,yaw,0);
 
-        pidRoll = rollPid.calcPID(0, roll);
-        pidPitch = pitchPid.calcPID(0, pitch);
-        pidYaw = yawPid.calcPID(0, yaw);
+        pidRoll = rollPid.calcPID(x, roll);
+        pidPitch = pitchPid.calcPID(y, pitch);
+        pidYaw = yawPid.calcPID(z, yaw);
 
-        Motor1_speed = throttle - pidRoll + pidPitch - pidYaw;
-        Motor2_speed = throttle + pidRoll + pidPitch + pidYaw;
-        Motor3_speed = throttle + pidRoll - pidPitch - pidYaw;
-        Motor4_speed = throttle - pidRoll - pidPitch + pidYaw;
+        Motor1_speed = throttle - pidRoll + pidPitch + pidYaw;
+        Motor2_speed = throttle + pidRoll + pidPitch - pidYaw;
+        Motor3_speed = throttle + pidRoll - pidPitch + pidYaw;
+        Motor4_speed = throttle - pidRoll - pidPitch - pidYaw;
 
-        if(Motor1_speed < 0) Motor1_speed = 0;
-        else if(Motor1_speed >240) Motor1_speed = 240;
-        if(Motor2_speed < 0) Motor2_speed = 0;
-        else if(Motor2_speed >240) Motor2_speed = 240;
-        if(Motor3_speed < 0) Motor3_speed = 0;
-        else if(Motor3_speed >240) Motor3_speed = 240;
-        if(Motor4_speed < 0) Motor4_speed = 0;
-        else if(Motor4_speed >240) Motor4_speed = 240;
+        if(Motor1_speed < 700) Motor1_speed = 700;
+        if(Motor2_speed < 700) Motor2_speed = 700;
+        if(Motor3_speed < 700) Motor3_speed = 700;
+        if(Motor4_speed < 700) Motor4_speed = 700;
 
 
-        //if(pidRoll != tmpR || pidPitch != tmpP)
         if(cnt==200)
         {
             printf("ROLL : %3.6f, PITCH %3.7f, YAW %3.7f\n", roll, pitch, yaw);
@@ -138,16 +141,15 @@ int main(int argc, char* argv[])
             printf("motor speed [1]:%d [2]:%d [3]:%d [4]:%d\n\n\n", Motor1_speed, Motor2_speed, Motor3_speed, Motor4_speed);
             cnt=0;
         }
-        else if(pidRoll != tmpR || pidPitch != tmpP)
-        {
             cnt++;
-        }
 
-        json_write(udp,roll,pitch,yaw,0);
-
-        tmpR = pidRoll;
-        tmpP = pidPitch;
-        tmpY = pidYaw;
+            if(Emergency)
+            {
+                Motor1_speed = 700;
+                Motor2_speed = 700;
+                Motor3_speed = 700;
+                Motor4_speed = 700;
+            }
 
         motor[0].setSpeed(Motor1_speed);
         motor[1].setSpeed(Motor2_speed);
@@ -178,7 +180,7 @@ int main(int argc, char* argv[])
             rollPid.initKpid(pp, pi, pd);
             pitchPid.initKpid(pp, pi, pd);
             yawPid.initKpid(pp, pi, pd);
-
+            Emergency=0;
             printf("pid reset complete\n");
         }
         else if(tcp_flag==5)
