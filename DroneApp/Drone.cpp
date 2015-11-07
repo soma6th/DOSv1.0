@@ -1,5 +1,5 @@
 #define _EMAX_30A_ESC_
-#define _MPU6050_HMC5883L_
+#define _MPU6050_
 
 #include "../Superman/Drone.h"
 #include <stdio.h>
@@ -108,7 +108,7 @@ int main(int argc, char* argv[])
 
         imu.getIMUData(&pitch, &roll, &yaw);
 
-        yaw=0;
+        //yaw=0;
         //       json_write(udp,roll,pitch,yaw,0);
 
         pidRoll = rollPid.calcPID(0, roll);
