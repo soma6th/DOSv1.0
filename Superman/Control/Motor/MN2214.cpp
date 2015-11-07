@@ -70,11 +70,11 @@ void Motor::calibration()
     // NoESC needs not calibration
 
     printf("Start Cali!!\n");
-    softPwmWrite(pin, 2200); //주기보다 최소 200us이상 작아야함.
+    softPwmWrite(pin, 2000); //주기보다 최소 200us이상 작아야함.
     delay(4000); //최소 3500us이상 이어야함.
 
     printf("Finish Cali!!\n");
-    softPwmWrite(pin, 800); //700us보다 50us이상 커야함
+    softPwmWrite(pin, 1000); //700us보다 50us이상 커야함
     delay(4000); //최소 3500us이상 이어야함.
 
 }
