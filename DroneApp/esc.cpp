@@ -13,11 +13,11 @@ int main(int argc, char* argv[])
 
 
     Motor motor[4];
-       motor[0].init();
-motor[1].init();
-motor[2].init();
-motor[3].init();
-    
+    motor[0].init();
+    motor[1].init();
+    motor[2].init();
+    motor[3].init();
+
 
     motor[0].setPin(22);
     motor[1].setPin(23);
