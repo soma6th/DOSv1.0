@@ -10,6 +10,6 @@
 #include "XXD_20A_ESC.cpp"
 #endif
 
-#ifdef _MN2214_DSC_
+#ifdef _MN2214_ESC_
 #include "MN2214.cpp"
 #endif
