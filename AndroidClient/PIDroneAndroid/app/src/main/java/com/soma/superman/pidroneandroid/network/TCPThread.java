@@ -16,12 +16,12 @@ import java.net.Socket;
  * Created by whee6409 on 15. 11. 6.
  */
 public class TCPThread extends Thread{
-    public static String ip = "10.10.0.1";
-    public static int port = 8003;
-    public static boolean flag = false;
-    public DataInputStream inputStream;
-    public DataOutputStream outputStream;
+    private static String ip = "10.10.0.1";
+    private static int port = 8003;
+    private DataInputStream inputStream;
+    private DataOutputStream outputStream;
     public Socket mSocket;
+    public static boolean flag = false;
 
     public TCPThread() {}
 
@@ -29,10 +29,8 @@ public class TCPThread extends Thread{
         boolean isInit = false;
         setSocket(ip, port);
         if(readChar() == (char)1) {
-            Log.i("read byte 1", "in");
             sendChar((char) 1);
             if(readChar() == (char)1) {
-                Log.i("read byte 2", "in");
                 isInit = true;
             }
         }
@@ -44,13 +42,19 @@ public class TCPThread extends Thread{
 
     }
 
+    // header
+    // -1이면 종료/에러
+    // 0이면 hello data
+    // 1이면 init msg
+    // 2이면 emergency exit
+    // 3이면 PID reset
+
     public void sendChar(char header) {
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(outputStream));
         try {
             if(flag == false) {
                 bw.write(header);
                 bw.flush();
-                Log.i("byte header", "" + header);
             } else if(flag == true) {
                 bw.flush();
             }
@@ -65,12 +69,9 @@ public class TCPThread extends Thread{
         try {
             char [] read = null;
             while(read == null) {
-                Log.i("read byte", "in");
                 read = new char[1];
                 br.read(read, 0, 1);
-                Log.i("read ", "" + read);
                 header = read[0];
-                Log.i("read byte", ""+header);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -83,7 +84,6 @@ public class TCPThread extends Thread{
         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
         try {
             String jsonMessage = br.readLine();
-            Log.i("read message", "br read line "+jsonMessage);
             readPacket = PacketVO.jsonToPacket(jsonMessage);
         } catch (IOException e) {
             e.printStackTrace();
@@ -104,16 +104,23 @@ public class TCPThread extends Thread{
         pw.flush();
     }
 
-    public void setSocket(String ip, int port) {
+    private void setSocket(String ip, int port) {
         try {
-            Log.d("setSocket", "start");
             mSocket = new Socket(ip, port);
             inputStream = new DataInputStream(mSocket.getInputStream());
             outputStream = new DataOutputStream(mSocket.getOutputStream());
-            Log.d("setSocket", "end");
         } catch (IOException e) {
             e.printStackTrace();
-            Log.e("setSocket", "error");
+        }
+    }
+
+    public void closeSocket() {
+        try {
+            inputStream.close();
+            outputStream.close();
+            mSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

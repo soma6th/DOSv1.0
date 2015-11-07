@@ -51,7 +51,8 @@ public class Superman extends Activity {
     // variables
     double pitch = 0.0, roll = 0.0, yaw = 0.0;
     int thr = 0;
-    double lastThr = 0;
+    double lastYaw = 0.0;
+    double lastThr = 0.0;
     double x, y, z;
 
     // Method for initialize UI components (Load and Inflate)
@@ -229,6 +230,13 @@ public class Superman extends Activity {
         btnTCPConnect.setOnClickListener(this.btnClickListener);
         btnExit.setOnClickListener(this.btnClickListener);
         btnM1.setOnClickListener(this.btnClickListener);
+        btnM2.setOnClickListener(this.btnClickListener);
+        btnM3.setOnClickListener(this.btnClickListener);
+        btnP1.setOnClickListener(this.btnClickListener);
+        btnP2.setOnClickListener(this.btnClickListener);
+        btnP3.setOnClickListener(this.btnClickListener);
+        btnPIDReset.setOnClickListener(this.btnClickListener);
+        btnStop.setOnClickListener(this.btnClickListener);
     }
 
     private void joystickSet() {
@@ -299,15 +307,19 @@ public class Superman extends Activity {
         joystickR.setLayoutAlpha(100);
         joystickR.setOffset(90);
         joystickR.setMinimumDistance(10);
-        joystickR.drawStick(joystickR.getLayoutWidth() / 2.0f, joystickR.getLayoutHeight() - joystickR.getOffset());
+        joystickR.drawStick(joystickR.getLayoutWidth() / 2.0, joystickR.getLayoutHeight() - joystickR.getOffset());
         layoutJoystickR.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 if(motionEvent.getAction() == MotionEvent.ACTION_DOWN ||
                         motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
                     joystickR.drawStick(motionEvent);
-                    yaw = joystickR.getX();
-                    if(joystickR.getY() != 0.0f) {
+                    if(joystickR.getX() != 0.0) {
+                        yaw = joystickR.getX();
+                        lastYaw = motionEvent.getX();
+                    }
+
+                    if(joystickR.getY() != 0.0) {
                         thr = (int) ((joystickR.getY() + 10) * 100);
                         lastThr = motionEvent.getY();
                     }
@@ -330,16 +342,15 @@ public class Superman extends Activity {
                     }
                 } else if(motionEvent.getAction() == MotionEvent.ACTION_UP) {
                     if(thr == 0 ) {
-                        joystickR.drawStick(joystickR.getLayoutWidth() / 2.0f, joystickR.getLayoutHeight() - joystickR.getOffset());
+                        joystickR.drawStick(joystickR.getLayoutWidth() / 2.0, joystickR.getLayoutHeight() - joystickR.getOffset());
                     } else if(thr == 2000) {
-                        joystickR.drawStick(joystickR.getLayoutWidth() / 2.0f, joystickR.getOffset());
+                        joystickR.drawStick(joystickR.getLayoutWidth() / 2.0, joystickR.getOffset());
                     } else {
-                        joystickR.drawStick(joystickR.getLayoutHeight() / 2.0f, lastThr);
+                        joystickR.drawStick(lastYaw, lastThr);
                     }
-                    yaw = 0.0f;
-                    txtYaw.setText("Yaw : ");
+                    txtYaw.setText("Yaw : "+yaw);
                     txtThr.setText("Thr : "+thr);
-                    mMessage = new PacketVO("2", ""+0.0, ""+0.0, ""+0.0, ""+thr);
+                    mMessage = new PacketVO("2", ""+0.0, ""+0.0, ""+yaw, ""+thr);
                     String jsonPacket = PacketVO.packetToJson(mMessage);
                     try {
                         mUdpThread.sendPacket(jsonPacket);
@@ -375,6 +386,16 @@ public class Superman extends Activity {
         }
     }
 
+    private void closeNetworkThreads() {
+        try {
+            mTcpThread.inputStream.close();
+            mTcpThread.outputStream.close();
+            mTcpThread.mSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -394,13 +415,7 @@ public class Superman extends Activity {
     protected void onStop() {
         super.onStop();
         if(mTcpThread != null) {
-            try {
-                mTcpThread.inputStream.close();
-                mTcpThread.outputStream.close();
-                mTcpThread.mSocket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            closeNetworkThreads();
         }
     }
 }

@@ -24,7 +24,7 @@ public class ControllerActivity extends Activity{
     // UI components
     RelativeLayout layoutJoystickL, layoutJoystickR;
     TextView txtPitch, txtRoll, txtThr, txtYaw;
-    Button btnConncet;
+    Button btnConnect;
     Joystick joystickL, joystickR;
     View.OnClickListener btnClickListener;
 
@@ -32,12 +32,12 @@ public class ControllerActivity extends Activity{
     TCPThread mTcpThread;
     UDPThread mUdpThread;
     PacketVO mMessage;
-    String udpMsg;
 
     // variables
     double pitch = 0.0, roll = 0.0, yaw = 0.0;
     int thr = 0;
-    double lastThr = 0;
+    double lastYaw = 0.0;
+    double lastThr = 0.0;
     boolean isConnectTCP = false;
     boolean isConnectUDP = false;
 
@@ -53,7 +53,11 @@ public class ControllerActivity extends Activity{
         txtThr.setText("Thr : ");
         txtYaw.setText("Yaw : ");
 
-        btnConncet = (Button)findViewById(R.id.btn_connect);
+        btnConnect = (Button)findViewById(R.id.btn_connect);
+
+        layoutJoystickL = (RelativeLayout)findViewById(R.id.layout_joystick_left);
+        layoutJoystickR = (RelativeLayout)findViewById(R.id.layout_joystick_right);
+
     }
 
     private void initActionListeners(){
@@ -65,12 +69,12 @@ public class ControllerActivity extends Activity{
                         if (mTcpThread == null && mUdpThread == null) {
                             initNetworkThreads();
                             if (isConnectTCP && isConnectUDP) {
-                                btnConncet.setText("Disconnect");
+                                btnConnect.setText("Disconnect");
                             }
                         } else if (mTcpThread != null && mUdpThread != null) {
                             closeNetworkThreads();
                             if (isConnectTCP && isConnectUDP) {
-                                btnConncet.setText("Connect");
+                                btnConnect.setText("Connect");
                             }
                         }
                         break;
@@ -80,18 +84,12 @@ public class ControllerActivity extends Activity{
     }
 
     private void bindActionListeners(){
-
+        btnConnect.setOnClickListener(btnClickListener);
     }
 
     private void joystickSet() {
-        layoutJoystickL = (RelativeLayout)findViewById(R.id.layout_joystick_left);
         joystickL = new Joystick(getApplicationContext(), layoutJoystickL, R.drawable.image_button);
-        joystickL.setStickSize(150, 150);
-        joystickL.setLayoutSize(500, 500);
-        joystickL.setLayoutAlpha(100);
-        joystickL.setOffset(90);
-        joystickL.setMinimumDistance(10);
-        joystickL.drawStick(joystickL.getLayoutWidth() / 2.0f, joystickL.getLayoutHeight() / 2.0f);
+        joystickL.drawStick(joystickL.getLayoutWidth() / 2.0, joystickL.getLayoutHeight() / 2.0);
         layoutJoystickL.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -109,19 +107,14 @@ public class ControllerActivity extends Activity{
                         if (mUdpThread.receivePacket().get("P_H").toString().equals("2")) {
                             mTcpThread.sendChar((char) 0);
                         }
-
-                        if(mUdpThread != null) {
-                            Log.i("udp ", "message in main activity in");
-                            udpMsg = mUdpThread.msg;
-                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
 
                 } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                    joystickL.drawStick(joystickL.getLayoutWidth() / 2.0f, joystickL.getLayoutHeight() / 2.0f);
-                    pitch = 0.0f;
-                    roll = 0.0f;
+                    joystickL.drawStick(joystickL.getLayoutWidth() / 2.0, joystickL.getLayoutHeight() / 2.0);
+                    pitch = 0.0;
+                    roll = 0.0;
                     txtPitch.setText("Pitch : ");
                     txtRoll.setText("Roll : ");
                     mMessage = new PacketVO("2", "" + 0.0, "" + 0.0, "" + 0.0, "" + thr);
@@ -131,11 +124,6 @@ public class ControllerActivity extends Activity{
                         if (mUdpThread.receivePacket().get("P_H").toString().equals("2")) {
                             mTcpThread.sendChar((char) 0);
                         }
-
-                        if(mUdpThread != null) {
-                            Log.i("udp ", "message in main activity in");
-                            udpMsg = mUdpThread.msg;
-                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -144,14 +132,8 @@ public class ControllerActivity extends Activity{
             }
         });
 
-        layoutJoystickR = (RelativeLayout)findViewById(R.id.layout_joystick_right);
         joystickR = new Joystick(getApplicationContext(), layoutJoystickR, R.drawable.image_button);
-        joystickR.setStickSize(150, 150);
-        joystickR.setLayoutSize(500, 500);
-        joystickR.setLayoutAlpha(100);
-        joystickR.setOffset(90);
-        joystickR.setMinimumDistance(10);
-        joystickR.drawStick(joystickR.getLayoutWidth() / 2.0f, joystickR.getLayoutHeight() - joystickR.getOffset());
+        joystickR.drawStick(joystickR.getLayoutWidth() / 2.0, joystickR.getLayoutHeight() - joystickR.getOffset());
         layoutJoystickR.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -159,7 +141,7 @@ public class ControllerActivity extends Activity{
                         motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
                     joystickR.drawStick(motionEvent);
                     yaw = joystickR.getX();
-                    if(joystickR.getY() != 0.0f) {
+                    if(joystickR.getY() != 0.0) {
                         thr = (int) ((joystickR.getY() + 10) * 100);
                         lastThr = motionEvent.getY();
                     }
@@ -172,23 +154,18 @@ public class ControllerActivity extends Activity{
                         if(mUdpThread.receivePacket().get("P_H").toString().equals("2")) {
                             mTcpThread.sendChar((char)0);
                         }
-
-                        if(mUdpThread != null) {
-                            Log.i("udp ", "message in main activity in");
-                            udpMsg = mUdpThread.msg;
-                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 } else if(motionEvent.getAction() == MotionEvent.ACTION_UP) {
                     if(thr == 0 ) {
-                        joystickR.drawStick(joystickR.getLayoutWidth() / 2.0f, joystickR.getLayoutHeight() - joystickR.getOffset());
+                        joystickR.drawStick(joystickR.getLayoutWidth() / 2.0, joystickR.getLayoutHeight() - joystickR.getOffset());
                     } else if(thr == 2000) {
-                        joystickR.drawStick(joystickR.getLayoutWidth() / 2.0f, joystickR.getOffset());
+                        joystickR.drawStick(joystickR.getLayoutWidth() / 2.0, joystickR.getOffset());
                     } else {
-                        joystickR.drawStick(joystickR.getLayoutHeight() / 2.0f, lastThr);
+                        joystickR.drawStick(joystickR.getLayoutHeight() / 2.0, lastThr);
                     }
-                    yaw = 0.0f;
+                    yaw = 0.0;
                     txtYaw.setText("Yaw : ");
                     txtThr.setText("Thr : "+thr);
                     mMessage = new PacketVO("2", ""+0.0, ""+0.0, ""+0.0, ""+thr);
@@ -197,11 +174,6 @@ public class ControllerActivity extends Activity{
                         mUdpThread.sendPacket(jsonPacket);
                         if(mUdpThread.receivePacket().get("P_H").toString().equals("2")) {
                             mTcpThread.sendChar((char)0);
-                        }
-
-                        if(mUdpThread != null) {
-                            Log.i("udp ", "message in main activity in");
-                            udpMsg = mUdpThread.msg;
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -229,13 +201,9 @@ public class ControllerActivity extends Activity{
     }
 
     private void closeNetworkThreads() {
-        try {
-            mTcpThread.inputStream.close();
-            mTcpThread.outputStream.close();
-            mTcpThread.mSocket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        mTcpThread.closeSocket();
+        isConnectTCP = false;
+        isConnectUDP = false;
     }
 
     @Override

@@ -11,17 +11,11 @@ import org.json.simple.parser.ParseException;
  * Created by whee6409 on 15. 11. 6.
  */
 public class PacketVO {
-    public static final int DATA_SIZE = 20;
-    String P_H;
-    // -1이면 에러
-    // 0이면 종료
-    // 1이면 init -> 안드로이드 먼저 서버에 보내고, 버전을 받음.
-    // 2이면 안드로이드 -> 서버
-    // 3이면 서버 -> 안드로이드 (status 데이터)
-    String P_X;
-    String P_Y;
-    String P_Z;
-    String P_T;
+    private String P_H;
+    private String P_X;
+    private String P_Y;
+    private String P_Z;
+    private String P_T;
 
     public PacketVO() { }
 
@@ -39,7 +33,7 @@ public class PacketVO {
 
     public static PacketVO jsonToPacket(String jsonMessage) {
         PacketVO readPacket = new PacketVO();
-        JSONObject jsonObject = null;
+        JSONObject jsonObject;
         try {
             jsonObject = (JSONObject)new JSONParser().parse(jsonMessage);
             readPacket = new PacketVO();

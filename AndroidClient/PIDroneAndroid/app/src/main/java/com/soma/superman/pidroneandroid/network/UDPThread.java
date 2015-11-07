@@ -16,11 +16,10 @@ import java.net.UnknownHostException;
  * Created by whee6409 on 15. 11. 6.
  */
 public class UDPThread extends Thread {
-    boolean isConnect = false;
     public DatagramSocket socket;
-    DatagramPacket packet;
-    static InetAddress serverIP;
-    static int port = 8004;
+    private DatagramPacket packet;
+    private static InetAddress serverIP;
+    private static int port = 8004;
     public String msg = null;
 
     public UDPThread() {}
@@ -35,10 +34,8 @@ public class UDPThread extends Thread {
             String jsonMessage = PacketVO.packetToJson(mMessage);
             sendPacket(jsonMessage);
             JSONObject object = receivePacket();
-            Log.i("udp P_H top", "" + object.get("P_H").toString());
             try {
                 if(object.get("P_H").toString().equals("1")) {
-                    Log.i("udp", "P_H = 1");
                     mMessage = new PacketVO("1", "1", "2", "3", "4");
                     jsonMessage = PacketVO.packetToJson(mMessage);
                     sendPacket(jsonMessage);
@@ -50,15 +47,12 @@ public class UDPThread extends Thread {
             }
         } catch (UnknownHostException e) {
             e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
 
         return isInit;
     }
 
-    public void setSocket(InetAddress ip, int port) {
-        Log.i("UDP", "run start");
+    private void setSocket(InetAddress ip, int port) {
         try {
             socket = new DatagramSocket();
             socket.connect(ip, port);
@@ -79,7 +73,6 @@ public class UDPThread extends Thread {
             while(buffer == null) {
                 buffer = new String(packet.getData(), 0, packet.getLength());
                 msg = buffer;
-                Log.i("udp receive : ", ""+msg);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -93,7 +86,6 @@ public class UDPThread extends Thread {
             while(receive == null) {
                 receive = new String(packet.getData(), 0, packet.getLength());
                 jsonObject = new JSONObject(receive);
-                Log.i("UDP", "receive : "+jsonObject.toString());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -101,16 +93,17 @@ public class UDPThread extends Thread {
         return jsonObject;
     }
 
+    // header
+    // 1이면 init msg
+    // 2이면 control data (controller -> drone)
+    // 3이면 status data (drone -> controller)
+
     public void sendPacket(String mMessage) {
         byte [] buf = mMessage.getBytes();
-        Log.i("UDP", "buf = " + buf);
-
         try {
             packet = new DatagramPacket(buf, buf.length);
-            Log.i("UDP", "make packet");
             if(packet != null) {
                 socket.send(packet);
-                Log.i("UDP send ok", "" + mMessage);
             }
         } catch (IOException e) {
             e.printStackTrace();

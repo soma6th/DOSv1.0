@@ -15,9 +15,6 @@ public class LevelPreferences extends PreferenceActivity implements Preference.O
     public static final String KEY_SHOW_ANGLE 			= "preference_show_angle";
     public static final String KEY_DISPLAY_TYPE 		= "preference_display_type";
     public static final String KEY_VISCOSITY			= "preference_viscosity";
-    public static final String KEY_ECONOMY				= "preference_economy";
-
-    private SharedPreferences prefs;
 
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -30,8 +27,6 @@ public class LevelPreferences extends PreferenceActivity implements Preference.O
             preference.setSummary(displaySummary);
         } else if (KEY_VISCOSITY.equals(key)) {
             preference.setSummary(Viscosity.valueOf((String) newValue).getSummary());
-        } else if (KEY_ECONOMY.equals(key)) {
-            findPreference(KEY_VISCOSITY).setEnabled(!((Boolean) newValue));
         }
         return true;
     }
