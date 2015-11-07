@@ -1,4 +1,4 @@
-/*
+Ôªø/*
  * MPU6050.h
  *
  *  Created on: 2015. 9. 28.
@@ -21,14 +21,7 @@
 #include "SensorInterface.h"
 #include "MPU6050_Registers.h"
 
-#define MPU6050_DEBUG 0
-
-#if MPU6050_DEBUG
-	#define DEBUG_PRINT(fmt, ...) printf(fmt,##__VA_ARGS__)
-#else
-	#define DEBUG_PRINT(fmt, ...)
-#endif
-
+#define MPU6050_DEBUG 1
 
 class MPU6050 {
     public:
@@ -531,23 +524,23 @@ class IMU
 public:
 	/*
 	 * init() :
-	 * 		WiringPi, MPU6050 √ ±‚»≠, ø¨∞·»Æ¿Œ.
+	 * 		WiringPi, MPU6050 Ï¥àÍ∏∞Ìôî, Ïó∞Í≤∞ÌôïÏù∏.
 	 * return :
-	 * 		1  = ø¨∞· Ω«∆–, 0 = ø¨∞· º∫∞¯
+	 * 		1  = Ïó∞Í≤∞ Ïã§Ìå®, 0 = Ïó∞Í≤∞ ÏÑ±Í≥µ
 	 */
 	int init();
 
 	/*
 	 * getIMUData(float *roll, float *pitch, float *yaw) :
-	 * 		MPU6050¿« DMP∏¶ ≈Î«ÿ Roll, Pitch, Yaw∏¶ ∞ËªÍ.
+	 * 		MPU6050Ïùò DMPÎ•º ÌÜµÌï¥ Roll, Pitch, YawÎ•º Í≥ÑÏÇ∞.
 	 * 	return :
-	 * 		1 = Ω«∆–, 0 = º∫∞¯
+	 * 		1 = Ïã§Ìå®, 0 = ÏÑ±Í≥µ
 	 */
 	int getIMUData(float *roll, float *pitch, float *yaw);
 
 	/*
 	 * void calibration() :
-	 * 		ºæº≠ offest ∫∏¡§
+	 * 		ÏÑºÏÑú offest Î≥¥Ï†ï
 	 */
 	void calibration();
 

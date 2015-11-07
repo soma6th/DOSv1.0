@@ -1,4 +1,4 @@
-/*
+ï»¿/*
  * MPU6050.cpp
  *
  *  Created on: 2015. 9. 28.
@@ -3629,7 +3629,7 @@ void MPU6050::getAverageData(int *mean_ax, int *mean_ay, int *mean_az, int *mean
 		int16_t ax, ay, az,gx, gy, gz;
 		getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
 
-		if (i > 100 && i <= count + 100) //Ã³À½ 100°³ÀÇ µ¥ÀÌÅÍ´Â »ç¿ëµÇÁö¾ÊÀ½
+		if (i > 100 && i <= count + 100) //ì²˜ìŒ 100ê°œì˜ ë°ì´í„°ëŠ” ì‚¬ìš©ë˜ì§€ì•ŠìŒ
 		{
 			buff_ax += ax;
 			buff_ay += ay;
@@ -3649,6 +3649,7 @@ void MPU6050::getAverageData(int *mean_ax, int *mean_ay, int *mean_az, int *mean
 			*mean_gy = buff_gy / count;
 			*mean_gz = buff_gz / count;
 	    }
+	    delay(2); //Needed so we don't get repeated measures
 	}
 }
 
@@ -3678,11 +3679,12 @@ void MPU6050::Calibration(int count, int acel_deadzone, int giro_deadzone)
     	switch(i)
     	{
     		case 0:
-    			DEBUG_PRINT("Reading sensors for first time...");
+    			std::cout << "Reading sensors for first time..." << std::endl;
     			getAverageData(&mean_ax, &mean_ay, &mean_az, &mean_gx, &mean_gy, &mean_gz, count);
+    			delay(500);
     			break;
     		case 1:
-    			DEBUG_PRINT("Calculating offsets...");
+    			std::cout << "Calculating offsets..." << std::endl;
 
 				ax_offset = -mean_ax / 8;
 				ay_offset = -mean_ay / 8;
@@ -3726,21 +3728,29 @@ void MPU6050::Calibration(int count, int acel_deadzone, int giro_deadzone)
 					else gz_offset -= mean_gz / (giro_deadzone + 1);
 
 					if(ready == 6) break;
+					//else printf("ready value = %d\n", ready);
 				}
+				delay(500);
 				break;
     		case 2:
     			getAverageData(&mean_ax, &mean_ay, &mean_az, &mean_gx, &mean_gy, &mean_gz, count);
     			std::cout << "Calibration Finished!" << std::endl;
 
-    			DEBUG_PRINT("Sensor readings with offsets : acelX = %d\t acelY = %d\t acelZ = %d\n", mean_ax, mean_ay, mean_az);
-    			DEBUG_PRINT("Sensor readings with offsets : giroX = %d\t giroY = %d\t giroZ = %d\n", mean_gx, mean_gy, mean_gz);
+    			printf("Sensor readings with offsets : acelX = %d\t acelY = %d\t acelZ = %d\n", mean_ax, mean_ay, mean_az);
+    			printf("Sensor readings with offsets : giroX = %d\t giroY = %d\t giroZ = %d\n", mean_gx, mean_gy, mean_gz);
 
-    			DEBUG_PRINT("Your offsets: acelX = %d\t acelY = %d\t acelZ = %d\n", ax_offset, ay_offset, az_offset);
-    			DEBUG_PRINT("Your offsets: giroX = %d\t giroY = %d\t giroZ = %d\n", gx_offset, gy_offset, gz_offset);
+    			printf("Your offsets: acelX = %d\t acelY = %d\t acelZ = %d\n", ax_offset, ay_offset, az_offset);
+    			printf("Your offsets: giroX = %d\t giroY = %d\t giroZ = %d\n", gx_offset, gy_offset, gz_offset);
     			break;
     	}
     }
 }
+
+#if MPU6050_DEBUG
+	#define DEBUG_PRINT(fmt, ...) printf(fmt,##__VA_ARGS__)
+#else
+	#define DEBUG_PRINT(fmt, ...)
+#endif
 
 #define MPU6050_DMP_CODE_SIZE       1929    // dmpMemory[]
 #define MPU6050_DMP_CONFIG_SIZE     192     // dmpConfig[]
@@ -4375,7 +4385,7 @@ int IMU::getIMUData(float *roll, float *pitch, float *yaw)
 	mpu.setDMPEnabled(true);
 
 	uint16_t packetSize = mpu.dmpGetFIFOPacketSize();
-	while(mpu.getFIFOCount() < packetSize); //DMP Data°¡ µé¾î ¿Ã¶§ ±îÁö ´ë±â.
+	while(mpu.getFIFOCount() < packetSize); //DMP Dataê°€ ë“¤ì–´ ì˜¬ë•Œ ê¹Œì§€ ëŒ€ê¸°.
 
 	uint8_t mpuIntStatus = mpu.getIntStatus();
 	if(mpuIntStatus & 0x02)
