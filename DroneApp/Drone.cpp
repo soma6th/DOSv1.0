@@ -15,6 +15,7 @@ int main(int argc, char* argv[])
     char ff;
 
     int cnt=0;
+    int ycnt=0;
     //network about
     int tcp,udp;
     int flag,str_len,t=0;
@@ -70,7 +71,7 @@ int main(int argc, char* argv[])
     yawPid.setTuning(0.f, 0.f, 0.f);
     // 0.61 , 0.09, 0.16
 
-    float roll, pitch, yaw;
+    float roll, pitch, yaw, preYaw, rYaw;
     int pidRoll, pidPitch, pidYaw;
 
     imu.calibration();
@@ -89,44 +90,68 @@ int main(int argc, char* argv[])
 
     int Emergency = 0;
 
+    preYaw = 0;
+
     while(1)
     {
         flag=json_read(udp,&x,&y,&z,&t);
         /*
          * Input Action, roll, pitch, yaw, throttle
          */
+
         if(flag==1)
         {
-            //   printf("control data: %.2f %.2f %.2f %d\n",x,y,z,t);
-
             throttle = t;
         }
 
         imu.getIMUData(&roll, &pitch, &yaw);
 
-        if( pitch < -40 || pitch > 40 || roll < -40 || roll > 40)
+        if( pitch < -50 || pitch > 50 || roll < -50 || roll > 50)
         {
             Emergency = 1;
         }
-
-        //yaw=0;
         //       json_write(udp,roll,pitch,yaw,0);
 
-        pidRoll = rollPid.calcPID(x*(2), roll);
-        pidPitch = pitchPid.calcPID(y*(-2), pitch);
-        pidYaw = yawPid.calcPID(z*(2), yaw);
+        if(preYaw>100&&yaw<-100)
+            rYaw=360+yaw-preYaw;
+        else if(preYaw<-100&&yaw>100)
+            rYaw=360-yaw+preYaw;
+        else
+            rYaw= yaw - preYaw;
 
-//        Motor1_speed = throttle + pidPitch + pidYaw;
-//        Motor2_speed = throttle - pidRoll - pidYaw;
-//        Motor3_speed = throttle - pidPitch + pidYaw;
-//        Motor4_speed = throttle + pidRoll - pidYaw;
+        if(ycnt==33)
+        {
+            printf("rYaw: %.2lf preYaw: %.2lf yaw: %.2lf\n",rYaw,preYaw,yaw);
+            ycnt=0;
+        }
+        ycnt++;
+
+        preYaw = yaw;
+
+
+      //  if(abs(roll)>4||abs(pitch)>4)
+      //  {
+      //      rYaw=0;
+      //      z=0;
+      //  }
+
+
+        pidRoll = rollPid.calcPID(x*5, roll);
+        pidPitch = pitchPid.calcPID(y*(-5), pitch);
+        pidYaw = yawPid.calcPID(0, rYaw-z);
+
+
+        //        Motor1_speed = throttle + pidPitch + pidYaw;
+        //        Motor2_speed = throttle - pidRoll - pidYaw;
+        //        Motor3_speed = throttle - pidPitch + pidYaw;
+        //        Motor4_speed = throttle + pidRoll - pidYaw;
 
         Motor1_speed = throttle + pidRoll + pidPitch + pidYaw;
         Motor2_speed = throttle - pidRoll + pidPitch - pidYaw;
         Motor3_speed = throttle - pidRoll - pidPitch + pidYaw;
         Motor4_speed = throttle + pidRoll - pidPitch - pidYaw;
 
-        if(cnt==100)
+        if(cnt==33)
         {
             printf("X: %.2lf Y: %.2lf Z: %.2lf T:%d \n",x,y,z,t);
             printf("ROLL : %3.6f, PITCH %3.7f, YAW %3.7f\n", roll, pitch, yaw);
@@ -168,7 +193,7 @@ int main(int argc, char* argv[])
             pidbuf[str_len]=0;
             printf("pid reset data :%s\n",pidbuf);
             data=json_loads(pidbuf,JSON_DECODE_ANY,&error);
-            if((json_unpack(data,"{s:f,s:f,s:f}","P_P",&pp,"P_I",&pi,"P_D",&pd))!=0)
+            if((json_unpack(data,"{s:f,s:f,s:f,s:f,s:f,s:f}","P_P",&pp,"P_I",&pi,"P_D",&pd,"Y_P",&yp,"Y_I",&yi,"Y_D",&yd))!=0)
             {
                 printf("pid reset error\n");
                 recv_flag=0;
@@ -178,42 +203,30 @@ int main(int argc, char* argv[])
             recv_flag=1;
 
             send(tcp,&recv_flag,1,MSG_DONTROUTE);
-               
-            printf("input Yaw's pid : ");
-            scanf("%lf %lf %lf",&yp,&yi,&yd);
+
             rollPid.initKpid(pp, pi, pd);
             pitchPid.initKpid(pp, pi, pd);
             yawPid.initKpid(yp, yi, yd);
             Emergency=0;
-           
-            while(1)
-            {
 
-                str_len=recv(tcp,&ff,1,MSG_DONTROUTE|MSG_DONTWAIT);
-                str_len=recv(tcp,pidbuf,sizeof(pidbuf),MSG_DONTROUTE|MSG_DONTWAIT);
-                recv_flag=1;
-                send(tcp,&recv_flag,1,MSG_DONTROUTE);
-                if(str_len==-1)
-                {
-                    printf("nomore data dump\n");
-                    break;
-                }
-
-
-                //printf("roll and pitch kp: %.2lf ki: %.2lf kd: %.2lf\n",kp,ki,kd);
-                //printf("yaw pp: %.2lf pi: %.2lf pd: %.2lf\n",pp,pi,pd);
-                printf("pid reset complete\n");
-            }
+            printf("pid reset complete\n");
         }
         else if(tcp_flag==5)
         {
-
-            motor[0].setSpeed(600);
-            motor[1].setSpeed(600);
-            motor[2].setSpeed(600);
-            motor[3].setSpeed(600);
-
+            motor[0].setSpeed(700);
+            motor[1].setSpeed(700);
+            motor[2].setSpeed(700);
+            motor[3].setSpeed(700);
             printf("drone exit\n");
+            break;
+        }
+        else if(tcp_flag==0)
+        {
+            motor[0].setSpeed(700);
+            motor[1].setSpeed(700);
+            motor[2].setSpeed(700);
+            motor[3].setSpeed(700);
+            printf("Controller connection less\n");
             break;
         }
 

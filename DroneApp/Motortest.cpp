@@ -48,6 +48,21 @@ int main(int argc, char* argv[])
     Motor motor[4];
     IMU imu;
 
+
+    if(argc!=1 && argc!=5)
+    {
+        printf("./Motortest motor speed argu error\n");
+        exit(1);
+    }
+    
+    if(argc==5)
+    {
+    throttle[0]=atoi(argv[1]);
+    throttle[1]=atoi(argv[2]);
+    throttle[2]=atoi(argv[3]);
+    throttle[3]=atoi(argv[4]);
+    }
+
     for(int i = 0 ; i < 4 ; i++)
     {
         motor[i].init();
@@ -120,35 +135,36 @@ int main(int argc, char* argv[])
                     break;
 
                 case 'a':
-                    throttle[0]++;
+                    throttle[0]+=10;
                     break;
 
                 case 's':
-                    throttle[1]++;
+                    throttle[1]+=10;
                     break;
 
                 case 'd':
-                    throttle[2]++;
+                    throttle[2]+=10;
                     break;
 
                 case 'f':
-                    throttle[3]++;
+                    throttle[3]+=10;
                     break;
                 case 'z':
-                    throttle[0]--;
+                    throttle[0]-=10;
                     break;
                 case 'x':
-                    throttle[1]--;
+                    throttle[1]-=10;
                     break;
                 case 'c':
-                    throttle[2]--;
+                    throttle[2]-=10;
                     break;
                 case 'v':
-                    throttle[3]--;
+                    throttle[3]-=10;
                     break;
-        printf("t[0]: %d t[1]: %d t[2]: %d t[3]: %d\n",throttle[0],throttle[1],throttle[2],throttle[3]);
+
             }
 
+            printf("t[0]: %d t[1]: %d t[2]: %d t[3]: %d\n",throttle[0],throttle[1],throttle[2],throttle[3]);
         }
         else if(res < 0)
         {
@@ -160,7 +176,6 @@ int main(int argc, char* argv[])
 
         }
 
-        printf("t[0]: %d t[1]: %d t[2]: %d t[3]: %d\n",throttle[0],throttle[1],throttle[2],throttle[3]);
         motor[0].setSpeed(throttle[0]); 
         motor[1].setSpeed(throttle[1]);
         motor[2].setSpeed(throttle[2]);
