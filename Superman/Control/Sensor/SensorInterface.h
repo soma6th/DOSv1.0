@@ -1,4 +1,4 @@
-/*
+ï»¿/*
  * SensorInterface.h
  *
  *  Created on: 2015. 10. 7.
@@ -9,31 +9,57 @@
 #define SENSORINTERFACE_H_
 
 /*
- * IMUÀÇ ±âº»ÀûÀÎ ÇÔ¼öµéÀ» Á¤ÀÇ ÇÑ ºÎºĞÀ¸·Î, »õ·Î¿î ¼¾¼­¸¦ Ãß°¡ÇÒ¶§ IMUInterface Å¬·¡½º¸¦ »ó¼Ó ¹Ş¾Æ ÄÚµùÇÒ °Í.
+ * IMUì˜ ê¸°ë³¸ì ì¸ í•¨ìˆ˜ë“¤ì„ ì •ì˜ í•œ ë¶€ë¶„ìœ¼ë¡œ, ìƒˆë¡œìš´ ì„¼ì„œë¥¼ ì¶”ê°€í• ë•Œ IMUInterface í´ë˜ìŠ¤ë¥¼ ìƒì† ë°›ì•„ ì½”ë”©í•  ê²ƒ.
  */
 
 class IMUInterface
 {
 public:
 	/*
-	 * init() :
-	 * 		¼¾¼­  ÃÊ±âÈ­, ¿¬°áÈ®ÀÎ.
-	 * return :
-	 * 		1  = ¿¬°á ¼º°ø , 0 = ¿¬°á ½ÇÆĞ
+	 * @function : WiringPi, MPU6050 ì´ˆê¸°í™”, ì—°ê²°í™•ì¸.
+	 * @return   : 1  = ì—°ê²° ì‹¤íŒ¨, 0 = ì—°ê²° ì„±ê³µ
+	 * @detail   : ê³µí†µë¶€ë¶„
 	 */
 	int init();
 
 	/*
-	 * getIMUData(float *roll, float *pitch, float *yaw) :
-	 * 		¼¾¼­ÀÇ Roll, Pitch, Yaw¸¦ °è»ê.
-	 */
-	void getIMUData(float *roll, float *pitch, float *yaw);
-
-	/*
-	 * void calibration() :
-	 * 		¼¾¼­ offest º¸Á¤
+	 * @function : ì„¼ì„œ offest ë³´ì •
+	 * @detail   : ê³µí†µë¶€ë¶„
 	 */
 	void calibration();
+
+	/*
+	 * @function : MPU6050ì˜ DMPë¥¼ í†µí•´ Roll, Pitch, Yawë¥¼ ê³„ì‚°.
+	 * @return	 : 1 = ì‹¤íŒ¨, 0 = ì„±ê³µ
+	 * @detail   : ê³µí†µë¶€ë¶„
+	 */
+	int getIMUData(float *roll, float *pitch, float *yaw);
+
+	/*
+	 * @function : ìì´ë¡œ ì„¼ì„œì™€ ê°€ì†ë„ì„¼ì„œì˜ offset ì½ê¸°
+	 * @param
+	 * 		gx = Gyro X axis offset
+	 * 		gy = Gyro Y axis offset
+	 * 		gz = Gyro Z axis offset
+	 * 		ax = Accel X axis offset
+	 * 		ay = Accel Y axis offset
+	 * 		az = Accel Z axis offset
+	 * @detail   : ê³µí†µë¶€ë¶„
+	 */
+	void getIMUOffset(int16_t *gx,int16_t *gy, int16_t *gz, int16_t *ax, int16_t *ay, int16_t *az);
+
+	/*
+	 * @function : ìì´ë¡œ ì„¼ì„œì™€ ê°€ì†ë„ì„¼ì„œì˜ offset ì„¤ì •
+	 * @param
+	 * 		gx = Gyro X axis offset
+	 * 		gy = Gyro Y axis offset
+	 * 		gz = Gyro Z axis offset
+	 * 		ax = Accel X axis offset
+	 * 		ay = Accel Y axis offset
+	 * 		az = Accel Z axis offset
+	 * @detail   : ê³µí†µë¶€ë¶„
+	 */
+	void setIMUoffset(int16_t gx,int16_t gy, int16_t gz, int16_t ax, int16_t ay, int16_t az);
 };
 
 
