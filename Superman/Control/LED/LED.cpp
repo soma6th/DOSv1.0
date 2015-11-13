@@ -10,6 +10,8 @@
 #include "LedInterface.h"
 #include <wiringPi.h>
 
+#define ON 1
+#define OFF 0
 /*
  *  LED()
  *  @function : Default constructor
@@ -28,6 +30,8 @@ int LED::setPin(int pinNum)
     wiringPiSetup();
     pin = pinNum;
     pinMode(pin, OUTPUT);
+
+    status = OFF;
 }
 
 /*
@@ -36,7 +40,8 @@ int LED::setPin(int pinNum)
  */
 void LED::on()
 {
-    digitalWrite(LED, HIGH);
+    digitalWrite(pin, HIGH);
+    status = ON;
 }
 
 
@@ -46,5 +51,24 @@ void LED::on()
  */
 void LED::off()
 {
-    digitalWrite(LED, LOW);
+    digitalWrite(pin, LOW);
+    status = OFF;
+}
+
+/*
+ * toggle()
+ *
+ */
+void LED::toggle()
+{
+    if( status == ON )
+    {
+        // ON
+        off();
+    }
+    else
+    {
+        // OFF
+        on();
+    }
 }

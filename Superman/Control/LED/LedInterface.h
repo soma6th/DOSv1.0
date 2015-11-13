@@ -11,6 +11,7 @@ class LED {
 
     private :
         int pin;
+        int status;
 
     public :
 
@@ -40,5 +41,9 @@ class LED {
          */
         void off();
 
-
-}
+        /*
+         * toggle()
+         *
+         */
+        void toggle();
+};
