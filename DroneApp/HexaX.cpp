@@ -1,11 +1,11 @@
 /*
- *  QuardX.cpp
+ *  HexaX.cpp
  *
- *  Data   : 2015.10.13
+ *  Data   : 2015.10.21
  *  Author : Jingyu Jung 
  *  Email  : monibu1548@gmail.com
  *
- *  PiDrone Application : 쿼트콥터 x 형태 드론을 위한 어플리케이션
+ *  PiDrone Application : 헥사콥터 x 형태 드론을 위한 어플리케이션
  */
 
 // ESC 변속기 장치 설정
@@ -60,22 +60,24 @@ int main(int argc, char* argv[])
     // 상대좌표 Yaw를 사용하기위한 보정 값
     float adjustYaw=0.f;
 
-    // Quardcopter 로 모터 4개 선언
-    Motor motor[4];
+    // Hexacopter 로 모터 6개 선언
+    Motor motor[6];
 
     // imu 장치 MPU6050 선언
     IMU imu;
 
-    for(int i = 0 ; i < 4 ; i++)
+    for(int i = 0 ; i < 6 ; i++)
     {
         motor[i].init();
     }
 
     // Setting Pin to Raspberry pi gpio
-    motor[0].setPin(22);
-    motor[1].setPin(23);
-    motor[2].setPin(24);
-    motor[3].setPin(25);
+    motor[0].setPin(20);
+    motor[1].setPin(21);
+    motor[2].setPin(22);
+    motor[3].setPin(23);
+    motor[4].setPin(24);
+    motor[5].setPin(25);
 
     
     // ESC Calibration
@@ -83,6 +85,8 @@ int main(int argc, char* argv[])
     motor[1].calibration();  
     motor[2].calibration();
     motor[3].calibration();
+    motor[4].calibration();
+    motor[5].calibration();
     
 
     if(imu.init())
@@ -114,7 +118,7 @@ int main(int argc, char* argv[])
     // 자이로센서 init 및 calibration
     imu.calibration();
 
-    int Motor1_speed, Motor2_speed, Motor3_speed, Motor4_speed;
+    int Motor1_speed, Motor2_speed, Motor3_speed, Motor4_speed, Motor5_speed, Motor6_speed;
 
     printf("Connect Application!!\n");
 
@@ -185,11 +189,13 @@ int main(int argc, char* argv[])
         pidPitch = pitchPid.calcPID(-y, pitch);
         pidYaw = yawPid.calcPID(0, rYaw-z);
 
-        // Quardcopter type X 의 모터 속도 연산
-        Motor1_speed = throttle + pidRoll + pidPitch + pidYaw;
-        Motor2_speed = throttle - pidRoll + pidPitch - pidYaw;
-        Motor3_speed = throttle - pidRoll - pidPitch + pidYaw;
-        Motor4_speed = throttle + pidRoll - pidPitch - pidYaw;
+        // Hexacopter type X 의 모터 속도 연산
+        Motor1_speed = throttle - 7/8*pidRoll + 1/2*pidPitch + pidYaw;
+        Motor2_speed = throttle - 7/8*pidRoll - 1/2*pidPitch - pidYaw;
+        Motor3_speed = throttle + 7/8*pidRoll + 1/2*pidPitch + pidYaw;
+        Motor4_speed = throttle + 7/8*pidRoll - 1/2*pidPitch - pidYaw;
+        Motor5_speed = throttle - pidPitch + pidYaw;
+        Motor6_speed = throttle + pidPitch - pidYaw;
 
         if(cnt==33)
         {

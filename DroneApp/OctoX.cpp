@@ -1,11 +1,11 @@
 /*
- *  QuardX.cpp
+ *  OctoX.cpp
  *
- *  Data   : 2015.10.13
+ *  Data   : 2015.10.21
  *  Author : Jingyu Jung 
  *  Email  : monibu1548@gmail.com
  *
- *  PiDrone Application : 쿼트콥터 x 형태 드론을 위한 어플리케이션
+ *  PiDrone Application : 옥타콥터 x 형태 드론을 위한 어플리케이션
  */
 
 // ESC 변속기 장치 설정
@@ -60,13 +60,13 @@ int main(int argc, char* argv[])
     // 상대좌표 Yaw를 사용하기위한 보정 값
     float adjustYaw=0.f;
 
-    // Quardcopter 로 모터 4개 선언
-    Motor motor[4];
+    // Octocopter 로 모터 8개 선언
+    Motor motor[8];
 
     // imu 장치 MPU6050 선언
     IMU imu;
 
-    for(int i = 0 ; i < 4 ; i++)
+    for(int i = 0 ; i < 8 ; i++)
     {
         motor[i].init();
     }
@@ -76,6 +76,10 @@ int main(int argc, char* argv[])
     motor[1].setPin(23);
     motor[2].setPin(24);
     motor[3].setPin(25);
+    motor[4].setPin(10);
+    motor[5].setPin(11);
+    motor[6].setPin(12);
+    motor[7].setPin(13);
 
     
     // ESC Calibration
@@ -83,6 +87,10 @@ int main(int argc, char* argv[])
     motor[1].calibration();  
     motor[2].calibration();
     motor[3].calibration();
+    motor[4].calibration();
+    motor[5].calibration();
+    motor[6].calibration();
+    motor[7].calibration();
     
 
     if(imu.init())
@@ -115,6 +123,7 @@ int main(int argc, char* argv[])
     imu.calibration();
 
     int Motor1_speed, Motor2_speed, Motor3_speed, Motor4_speed;
+    int Motor5_speed, Motor6_speed, Motor7_speed, Motor8_speed;
 
     printf("Connect Application!!\n");
 
@@ -185,11 +194,15 @@ int main(int argc, char* argv[])
         pidPitch = pitchPid.calcPID(-y, pitch);
         pidYaw = yawPid.calcPID(0, rYaw-z);
 
-        // Quardcopter type X 의 모터 속도 연산
-        Motor1_speed = throttle + pidRoll + pidPitch + pidYaw;
-        Motor2_speed = throttle - pidRoll + pidPitch - pidYaw;
-        Motor3_speed = throttle - pidRoll - pidPitch + pidYaw;
+        // Oxtocopter type X 의 모터 속도 연산
+        Motor1_speed = throttle - pidRoll + pidPitch - pidYaw;
+        Motor2_speed = throttle - pidRoll - pidPitch + pidYaw;
+        Motor3_speed = throttle + pidRoll + pidPitch + pidYaw;
         Motor4_speed = throttle + pidRoll - pidPitch - pidYaw;
+        Motor5_speed = throttle - pidRoll + pidPitch + pidYaw;
+        Motor6_speed = throttle - pidRoll - pidPitch - pidYaw;
+        Motor7_speed = throttle + pidRoll + pidPitch - pidYaw;
+        Motor8_speed = throttle + pidRoll - pidPitch + pidYaw;
 
         if(cnt==33)
         {

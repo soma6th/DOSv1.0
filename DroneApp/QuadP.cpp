@@ -1,11 +1,11 @@
 /*
- *  QuardX.cpp
+ *  QuardP.cpp
  *
- *  Data   : 2015.10.13
+ *  Data   : 2015.10.21
  *  Author : Jingyu Jung 
  *  Email  : monibu1548@gmail.com
  *
- *  PiDrone Application : 쿼트콥터 x 형태 드론을 위한 어플리케이션
+ *  PiDrone Application : 쿼트콥터 + 형태 드론을 위한 어플리케이션
  */
 
 // ESC 변속기 장치 설정
@@ -185,11 +185,11 @@ int main(int argc, char* argv[])
         pidPitch = pitchPid.calcPID(-y, pitch);
         pidYaw = yawPid.calcPID(0, rYaw-z);
 
-        // Quardcopter type X 의 모터 속도 연산
-        Motor1_speed = throttle + pidRoll + pidPitch + pidYaw;
-        Motor2_speed = throttle - pidRoll + pidPitch - pidYaw;
-        Motor3_speed = throttle - pidRoll - pidPitch + pidYaw;
-        Motor4_speed = throttle + pidRoll - pidPitch - pidYaw;
+        // Quardcopter type + 의 모터 속도 연산
+        Motor1_speed = throttle + pidRoll  + pidYaw;
+        Motor2_speed = throttle + pidPitch - pidYaw;
+        Motor3_speed = throttle - pidPitch + pidYaw;
+        Motor4_speed = throttle + pidRoll  - pidYaw;
 
         if(cnt==33)
         {
