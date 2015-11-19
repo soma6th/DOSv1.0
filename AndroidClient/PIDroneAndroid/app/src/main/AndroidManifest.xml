@@ -24,6 +24,12 @@
             </intent-filter>
         </activity>
 
+        <activity android:name="com.soma.superman.pidroneandroid.setting.SettingActivity" android:screenOrientation="landscape">
+            <intent-filter>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <activity android:hardwareAccelerated="true" android:name="com.soma.superman.pidroneandroid.level.LevelActivity"
             android:screenOrientation="portrait" android:theme="@style/Level.NoTitle">
             <intent-filter>
