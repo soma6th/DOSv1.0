@@ -8,6 +8,7 @@ import android.widget.ImageButton;
 
 import com.soma.superman.pidroneandroid.controller.ControllerActivity;
 import com.soma.superman.pidroneandroid.level.LevelActivity;
+import com.soma.superman.pidroneandroid.setting.SettingActivity;
 
 public class PIDroneActivity extends Activity {
 
@@ -28,6 +29,14 @@ public class PIDroneActivity extends Activity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), ControllerActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        btnSetting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), SettingActivity.class);
                 startActivity(intent);
             }
         });

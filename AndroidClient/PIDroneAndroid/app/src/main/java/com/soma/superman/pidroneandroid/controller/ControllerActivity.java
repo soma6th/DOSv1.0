@@ -1,7 +1,9 @@
 package com.soma.superman.pidroneandroid.controller;
 
 import android.app.Activity;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -13,8 +15,6 @@ import com.soma.superman.pidroneandroid.R;
 import com.soma.superman.pidroneandroid.network.PacketVO;
 import com.soma.superman.pidroneandroid.network.TCPThread;
 import com.soma.superman.pidroneandroid.network.UDPThread;
-
-import java.io.IOException;
 
 /**
  * Created by whee6409 on 15. 11. 4.
@@ -34,12 +34,37 @@ public class ControllerActivity extends Activity{
     PacketVO mMessage;
 
     // variables
-    double pitch = 0.0, roll = 0.0, yaw = 0.0;
+    double pitch = 0.0;
+    double roll = 0.0;
+    double yaw = 0.0;
     int thr = 0;
     double lastYaw = 0.0;
     double lastThr = 0.0;
+
     boolean isConnectTCP = false;
     boolean isConnectUDP = false;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if(Build.VERSION.SDK_INT > 9) {
+            StrictMode.setThreadPolicy((new android.os.StrictMode.ThreadPolicy.Builder()).permitAll().build());
+        }
+        setContentView(R.layout.activity_controller);
+
+        this.initComponents();
+        this.initActionListeners();
+        this.joystickSet();
+
+    }//end of onCreate()
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(mTcpThread != null) {
+            closeNetworkThreads();
+        }
+    }
 
     // Method for initialize UI components (Load and Inflate)
     private void initComponents(){
@@ -81,13 +106,12 @@ public class ControllerActivity extends Activity{
                 }
             }
         };// end of btnClickListener
-    }
 
-    private void bindActionListeners(){
         btnConnect.setOnClickListener(btnClickListener);
     }
 
     private void joystickSet() {
+        //left joystick
         joystickL = new Joystick(getApplicationContext(), layoutJoystickL, R.drawable.image_button);
         joystickL.drawStick(joystickL.getLayoutWidth() / 2.0, joystickL.getLayoutHeight() / 2.0);
         layoutJoystickL.setOnTouchListener(new View.OnTouchListener() {
@@ -131,49 +155,51 @@ public class ControllerActivity extends Activity{
                 return true;
             }
         });
-
+        //right joystick
         joystickR = new Joystick(getApplicationContext(), layoutJoystickR, R.drawable.image_button);
         joystickR.drawStick(joystickR.getLayoutWidth() / 2.0, joystickR.getLayoutHeight() - joystickR.getOffset());
         layoutJoystickR.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN ||
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN ||
                         motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
                     joystickR.drawStick(motionEvent);
-                    yaw = joystickR.getX();
-                    if(joystickR.getY() != 0.0) {
+                    if (joystickR.getX() != 0.0) {
+                        yaw = joystickR.getX();
+                        lastYaw = motionEvent.getX();
+                    }
+                    if (joystickR.getY() != 0.0) {
                         thr = (int) ((joystickR.getY() + 10) * 100);
                         lastThr = motionEvent.getY();
                     }
-                    txtYaw.setText("Yaw : "+yaw);
-                    txtThr.setText("Thr : "+thr);
-                    mMessage = new PacketVO("2", ""+pitch, ""+roll, ""+yaw, ""+thr);
+                    txtYaw.setText("Yaw : " + yaw);
+                    txtThr.setText("Thr : " + thr);
+                    mMessage = new PacketVO("2", "" + pitch, "" + roll, "" + yaw, "" + thr);
                     String jsonPacket = PacketVO.packetToJson(mMessage);
                     try {
                         mUdpThread.sendPacket(jsonPacket);
-                        if(mUdpThread.receivePacket().get("P_H").toString().equals("2")) {
-                            mTcpThread.sendChar((char)0);
+                        if (mUdpThread.receivePacket().get("P_H").toString().equals("2")) {
+                            mTcpThread.sendChar((char) 0);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                } else if(motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                    if(thr == 0 ) {
+                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    if (thr == 0) {
                         joystickR.drawStick(joystickR.getLayoutWidth() / 2.0, joystickR.getLayoutHeight() - joystickR.getOffset());
-                    } else if(thr == 2000) {
+                    } else if (thr == 2000) {
                         joystickR.drawStick(joystickR.getLayoutWidth() / 2.0, joystickR.getOffset());
                     } else {
-                        joystickR.drawStick(joystickR.getLayoutHeight() / 2.0, lastThr);
+                        joystickR.drawStick(lastYaw, lastThr);
                     }
-                    yaw = 0.0;
-                    txtYaw.setText("Yaw : ");
-                    txtThr.setText("Thr : "+thr);
-                    mMessage = new PacketVO("2", ""+0.0, ""+0.0, ""+0.0, ""+thr);
+                    txtYaw.setText("Yaw : " + yaw);
+                    txtThr.setText("Thr : " + thr);
+                    mMessage = new PacketVO("2", "" + 0.0, "" + 0.0, "" + 0.0, "" + thr);
                     String jsonPacket = PacketVO.packetToJson(mMessage);
                     try {
                         mUdpThread.sendPacket(jsonPacket);
-                        if(mUdpThread.receivePacket().get("P_H").toString().equals("2")) {
-                            mTcpThread.sendChar((char)0);
+                        if (mUdpThread.receivePacket().get("P_H").toString().equals("2")) {
+                            mTcpThread.sendChar((char) 0);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -206,26 +232,4 @@ public class ControllerActivity extends Activity{
         isConnectUDP = false;
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-//        if(Build.VERSION.SDK_INT > 9) {
-//            StrictMode.setThreadPolicy((new android.os.StrictMode.ThreadPolicy.Builder()).permitAll().build());
-//        }
-        setContentView(R.layout.activity_controller);
-
-        this.initComponents();
-        this.initActionListeners();
-        this.bindActionListeners();
-        this.joystickSet();
-
-    }//end of onCreate()
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if(mTcpThread != null) {
-            closeNetworkThreads();
-        }
-    }
 }
