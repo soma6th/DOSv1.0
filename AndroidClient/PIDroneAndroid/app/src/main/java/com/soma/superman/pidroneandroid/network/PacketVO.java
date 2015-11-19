@@ -19,6 +19,10 @@ public class PacketVO {
 
     public PacketVO() { }
 
+    public PacketVO(String jsonMessage){
+        //TODO need to implemente
+    }
+
     public PacketVO(String P_H, String P_X, String P_Y, String P_Z, String P_T) {
         this.P_H = P_H;
         this.P_X = P_X;
@@ -27,6 +31,7 @@ public class PacketVO {
         this.P_T = P_T;
     }
 
+    @Override
     public String toString() {
         return "Packet : "+P_H+", "+P_X+", "+P_Y+", "+P_Z+", "+P_T;
     }
