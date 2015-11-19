@@ -125,7 +125,7 @@ public class ControllerActivity extends Activity{
                     txtPitch.setText("Pitch : " + pitch);
                     txtRoll.setText("Roll : " + roll);
                     mMessage = new PacketVO("2", "" + pitch, "" + roll, "" + yaw, "" + thr);
-                    String jsonPacket = PacketVO.packetToJson(mMessage);
+                    String jsonPacket = mMessage.toJson();
                     try {
                         mUdpThread.sendPacket(jsonPacket);
                         if (mUdpThread.receivePacket().get("P_H").toString().equals("2")) {
@@ -142,7 +142,7 @@ public class ControllerActivity extends Activity{
                     txtPitch.setText("Pitch : ");
                     txtRoll.setText("Roll : ");
                     mMessage = new PacketVO("2", "" + 0.0, "" + 0.0, "" + 0.0, "" + thr);
-                    String jsonPacket = PacketVO.packetToJson(mMessage);
+                    String jsonPacket = mMessage.toJson();
                     try {
                         mUdpThread.sendPacket(jsonPacket);
                         if (mUdpThread.receivePacket().get("P_H").toString().equals("2")) {
@@ -175,7 +175,7 @@ public class ControllerActivity extends Activity{
                     txtYaw.setText("Yaw : " + yaw);
                     txtThr.setText("Thr : " + thr);
                     mMessage = new PacketVO("2", "" + pitch, "" + roll, "" + yaw, "" + thr);
-                    String jsonPacket = PacketVO.packetToJson(mMessage);
+                    String jsonPacket = mMessage.toJson();
                     try {
                         mUdpThread.sendPacket(jsonPacket);
                         if (mUdpThread.receivePacket().get("P_H").toString().equals("2")) {
@@ -195,7 +195,7 @@ public class ControllerActivity extends Activity{
                     txtYaw.setText("Yaw : " + yaw);
                     txtThr.setText("Thr : " + thr);
                     mMessage = new PacketVO("2", "" + 0.0, "" + 0.0, "" + 0.0, "" + thr);
-                    String jsonPacket = PacketVO.packetToJson(mMessage);
+                    String jsonPacket = mMessage.toJson();
                     try {
                         mUdpThread.sendPacket(jsonPacket);
                         if (mUdpThread.receivePacket().get("P_H").toString().equals("2")) {

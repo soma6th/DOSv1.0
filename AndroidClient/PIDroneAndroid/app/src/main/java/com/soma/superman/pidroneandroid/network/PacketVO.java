@@ -50,13 +50,14 @@ public class PacketVO {
         return "Packet : "+P_H+", "+P_X+", "+P_Y+", "+P_Z+", "+P_T;
     }
 
-    public static String packetToJson(PacketVO message) {
+    public String toJson(){
         String jsonPacket = new String();
-        jsonPacket+="{\"P_H\":"+message.P_H+"," +
-                "\"P_X\":"+message.P_X+","+
-                "\"P_Y\":"+message.P_Y+","+
-                "\"P_Z\":"+message.P_Z+","+
-                "\"P_T\":"+message.P_T+"}";
+        jsonPacket+="{\"P_H\":"+this.P_H+"," +
+                "\"P_X\":"+this.P_X+","+
+                "\"P_Y\":"+this.P_Y+","+
+                "\"P_Z\":"+this.P_Z+","+
+                "\"P_T\":"+this.P_T+"}";
         return jsonPacket;
     }
+    
 }

@@ -31,13 +31,13 @@ public class UDPThread extends Thread {
             setSocket(serverIP, port);
 
             PacketVO mMessage = new PacketVO ("1", "0.0", "0.0", "0.0", "0");
-            String jsonMessage = PacketVO.packetToJson(mMessage);
+            String jsonMessage = mMessage.toJson();
             sendPacket(jsonMessage);
             JSONObject object = receivePacket();
             try {
                 if(object.get("P_H").toString().equals("1")) {
                     mMessage = new PacketVO("1", "1", "2", "3", "4");
-                    jsonMessage = PacketVO.packetToJson(mMessage);
+                    jsonMessage = mMessage.toJson();
                     sendPacket(jsonMessage);
                     isInit = true;
                     return isInit;
