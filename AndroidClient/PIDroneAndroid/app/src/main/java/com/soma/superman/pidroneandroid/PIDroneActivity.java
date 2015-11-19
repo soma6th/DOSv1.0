@@ -48,5 +48,6 @@ public class PIDroneActivity extends Activity {
                 startActivity(intent);
             }
         });
-    }
+    }//end of onCreate
+
 }

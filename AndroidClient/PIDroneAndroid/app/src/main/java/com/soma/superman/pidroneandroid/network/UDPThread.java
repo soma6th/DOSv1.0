@@ -22,7 +22,13 @@ public class UDPThread extends Thread {
     private static int port = 8004;
     public String msg = null;
 
-    public UDPThread() {}
+    public UDPThread(){
+        super();
+    }
+
+    public UDPThread(String inetAddress, int port){
+        //TODO generic 하게 만들어야 함
+    }
 
     public boolean udpInit() {
         boolean isInit = false;
@@ -109,4 +115,5 @@ public class UDPThread extends Thread {
             e.printStackTrace();
         }
     }
+
 }
