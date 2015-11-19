@@ -21,7 +21,15 @@
 #include "SensorInterface.h"
 #include "MPU6050_Registers.h"
 
-#define MPU6050_DEBUG 1
+#define MPU6050_DEBUG 0
+
+#if MPU6050_DEBUG
+	#define DEBUG_PRINT(fmt, ...) printf(fmt,##__VA_ARGS__)
+#else
+	#define DEBUG_PRINT(fmt, ...)
+#endif
+
+using namespace std;
 
 class MPU6050 {
     public:
@@ -523,26 +531,50 @@ class IMU
 {
 public:
 	/*
-	 * init() :
-	 * 		WiringPi, MPU6050 초기화, 연결확인.
-	 * return :
-	 * 		1  = 연결 실패, 0 = 연결 성공
+	 * @function : WiringPi, MPU6050 초기화, 연결확인.
+	 * @return   : 1  = 연결 실패, 0 = 연결 성공
+	 * @detail   : 공통부분
 	 */
 	int init();
 
 	/*
-	 * getIMUData(float *roll, float *pitch, float *yaw) :
-	 * 		MPU6050의 DMP를 통해 Roll, Pitch, Yaw를 계산.
-	 * 	return :
-	 * 		1 = 실패, 0 = 성공
+	 * @function : 센서 offest 보정
+	 * @detail   : 공통부분
+	 */
+	void calibration();
+
+	/*
+	 * @function : MPU6050의 DMP를 통해 Roll, Pitch, Yaw를 계산.
+	 * @return	 : 1 = 실패, 0 = 성공
+	 * @detail   : 공통부분
 	 */
 	int getIMUData(float *roll, float *pitch, float *yaw);
 
 	/*
-	 * void calibration() :
-	 * 		센서 offest 보정
+	 * @function : 자이로 센서와 가속도센서의 offset 읽기
+	 * @param
+	 * 		gx = Gyro X axis offset
+	 * 		gy = Gyro Y axis offset
+	 * 		gz = Gyro Z axis offset
+	 * 		ax = Accel X axis offset
+	 * 		ay = Accel Y axis offset
+	 * 		az = Accel Z axis offset
+	 * @detail   : 공통부분
 	 */
-	void calibration();
+	void getIMUOffset(int16_t *gx,int16_t *gy, int16_t *gz, int16_t *ax, int16_t *ay, int16_t *az);
+
+	/*
+	 * @function : 자이로 센서와 가속도센서의 offset 설정
+	 * @param
+	 * 		gx = Gyro X axis offset
+	 * 		gy = Gyro Y axis offset
+	 * 		gz = Gyro Z axis offset
+	 * 		ax = Accel X axis offset
+	 * 		ay = Accel Y axis offset
+	 * 		az = Accel Z axis offset
+	 * @detail   : 공통부분
+	 */
+	void setIMUoffset(int16_t gx,int16_t gy, int16_t gz, int16_t ax, int16_t ay, int16_t az);
 
 private:
 	MPU6050 mpu;

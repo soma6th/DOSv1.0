@@ -2,10 +2,14 @@ CC = g++
 
 LDFLAGS = -lwiringPi -ljansson
 
-TARGET = Drone
-SRC = Drone.cpp
+all : QuadCopterX QuadCopterP HexaCopterX OctoCopterX
 
+QuadCopterX : ;$(CC) -o QuadCopterX QuadX.cpp $(LDFLAGS)
 
-drone : $(TARGET)
-	$(CC) -o $(TARGET) $(SRC) $(LDFLAGS)
+QuadCopterP : ;$(CC) -o QuadCopterP QuadP.cpp $(LDFLAGS)
 
+HexaCopterX : ;$(CC) -o HexaCopterX HexaX.cpp $(LDFLAGS)
+
+OctoCopterX : ;$(CC) -o OctoCopterX OctoX.cpp $(LDFLAGS)
+
+clean :; rm -rf QuadCopterX QuadCopterP HexaCopterX OctoCopterX

@@ -8,8 +8,6 @@
 
 #include "MPU6050.h"
 
-using namespace std;
-
 /** Default constructor, uses default I2C address.
  * @see MPU6050_DEFAULT_ADDRESS
  */
@@ -3649,17 +3647,12 @@ void MPU6050::getAverageData(int *mean_ax, int *mean_ay, int *mean_az, int *mean
 			*mean_gy = buff_gy / count;
 			*mean_gz = buff_gz / count;
 	    }
-	    delay(2); //Needed so we don't get repeated measures
+	    delay(2);
 	}
 }
 
 void MPU6050::Calibration(int count, int acel_deadzone, int giro_deadzone)
 {
-	//Change this 3 variables if you want to fine tune the skecth to your needs.
-	//count					//Amount of readings used to average, make it higher to get more precision but sketch will be slower  (default:1000)
-	//acel_deadzone			//Acelerometer error allowed, make it lower to get more precision, but sketch may not converge  (default:8)
-	//giro_deadzone			//Giro error allowed, make it lower to get more precision, but sketch may not converge  (default:1)
-
 	std::cout << "Don't touch it until you see a finish message." << std::endl;
 	setXAccelOffset(0);
     setYAccelOffset(0);
@@ -3745,12 +3738,6 @@ void MPU6050::Calibration(int count, int acel_deadzone, int giro_deadzone)
     	}
     }
 }
-
-#if MPU6050_DEBUG
-	#define DEBUG_PRINT(fmt, ...) printf(fmt,##__VA_ARGS__)
-#else
-	#define DEBUG_PRINT(fmt, ...)
-#endif
 
 #define MPU6050_DMP_CODE_SIZE       1929    // dmpMemory[]
 #define MPU6050_DMP_CONFIG_SIZE     192     // dmpConfig[]
@@ -4422,4 +4409,25 @@ int IMU::getIMUData(float *roll, float *pitch, float *yaw)
 void IMU::calibration()
 {
 	mpu.Calibration();
+}
+
+
+void IMU::getIMUOffset(int16_t *gx,int16_t *gy, int16_t *gz, int16_t *ax, int16_t *ay, int16_t *az)
+{
+	*gx = mpu.getXGyroOffset();
+	*gy = mpu.getYGyroOffset();
+	*gz = mpu.getZGyroOffset();
+	*ax = mpu.getXAccelOffset();
+	*ay = mpu.getYAccelOffset();
+	*az = mpu.getZAccelOffset();
+}
+
+void IMU::setIMUoffset(int16_t gx,int16_t gy, int16_t gz, int16_t ax, int16_t ay, int16_t az)
+{
+	mpu.setXGyroOffset(gx);
+	mpu.setYGyroOffset(gy);
+	mpu.setZGyroOffset(gz);
+	mpu.setXAccelOffset(ax);
+	mpu.setYAccelOffset(ay);
+	mpu.setZAccelOffset(az);
 }

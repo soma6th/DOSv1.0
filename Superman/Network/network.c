@@ -61,14 +61,12 @@ int json_read(int socket,double* x,double* y,double* z,int* t)
 		return 0;
 	}
 	buf[str_len]=0;
-	printf("control data: %s\n",buf);
     data=json_loads(buf,JSON_DECODE_ANY,&error);
     if((json_unpack(data,"{s:i,s:f,s:f,s:f,s:i}","P_H",&header,"P_X",x,"P_Y",y,"P_Z",z,"P_T",t))!=0)
     {
         //printf("json_unpack fail\n");
         return -1;
     }
-	printf("data read success\n");
     return 1;
 
 }
@@ -114,6 +112,11 @@ int tcp_read(int socket)
             printf("tcp data: %d\n",flag);
             return flag;
         }
+    }
+    else if(length==0)
+    {
+        printf("tcp connectless program exit\n");
+        return 0;
     }
     return -1;
 }
