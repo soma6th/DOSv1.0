@@ -17,13 +17,27 @@ public class PacketVO {
     private String P_Z;
     private String P_T;
 
-    public PacketVO() { }
+    public PacketVO() {
+        super();
+    }
 
     public PacketVO(String jsonMessage){
-        //TODO need to implemente
+        super();
+        JSONObject jsonObject;
+        try {
+            jsonObject = (JSONObject)new JSONParser().parse(jsonMessage);
+            this.P_H = jsonObject.get("P_H").toString();
+            this.P_X = jsonObject.get("P_X").toString();
+            this.P_Y = jsonObject.get("P_Y").toString();
+            this.P_Z = jsonObject.get("P_Z").toString();
+            this.P_T = jsonObject.get("P_T").toString();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 
     public PacketVO(String P_H, String P_X, String P_Y, String P_Z, String P_T) {
+        super();
         this.P_H = P_H;
         this.P_X = P_X;
         this.P_Y = P_Y;
@@ -34,25 +48,6 @@ public class PacketVO {
     @Override
     public String toString() {
         return "Packet : "+P_H+", "+P_X+", "+P_Y+", "+P_Z+", "+P_T;
-    }
-
-    public static PacketVO jsonToPacket(String jsonMessage) {
-        PacketVO readPacket = new PacketVO();
-        JSONObject jsonObject;
-        try {
-            jsonObject = (JSONObject)new JSONParser().parse(jsonMessage);
-            readPacket = new PacketVO();
-            readPacket.P_H = jsonObject.get("P_H").toString();
-            readPacket.P_X = jsonObject.get("P_X").toString();
-            readPacket.P_Y = jsonObject.get("P_Y").toString();
-            readPacket.P_Z = jsonObject.get("P_Z").toString();
-            readPacket.P_T = jsonObject.get("P_T").toString();
-            Log.i("read Packet", "" + readPacket.toString());
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        return readPacket;
     }
 
     public static String packetToJson(PacketVO message) {

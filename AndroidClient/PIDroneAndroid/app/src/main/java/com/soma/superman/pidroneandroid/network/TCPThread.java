@@ -39,7 +39,7 @@ public class TCPThread extends Thread{
 
     @Override
     public void run() {
-
+        //TODO reserved : TCP Receive will locate here
     }
 
     // header
@@ -80,14 +80,19 @@ public class TCPThread extends Thread{
     }
 
     public PacketVO readJsonMessage() {
-        PacketVO readPacket = new PacketVO();
+        PacketVO readPacket;
+        String jsonMessage = "";
+
+        //read json message
         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
         try {
-            String jsonMessage = br.readLine();
-            readPacket = PacketVO.jsonToPacket(jsonMessage);
+            jsonMessage = br.readLine();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        readPacket = new PacketVO(jsonMessage);
+
         return readPacket;
     }
 
